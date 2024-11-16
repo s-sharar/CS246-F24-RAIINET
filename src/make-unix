@@ -1,0 +1,24 @@
+#!/bin/bash
+rm -r unix
+mkdir unix
+awk '{ sub("\r$", ""); print }' Subject.cc > unix/Subject.cc
+awk '{ sub("\r$", ""); print }' Game.cc > unix/Game.cc
+awk '{ sub("\r$", ""); print }' Cell.cc > unix/Cell.cc
+awk '{ sub("\r$", ""); print }' Player.cc > unix/Player.cc
+awk '{ sub("\r$", ""); print }' Ability.cc > unix/Ability.cc
+awk '{ sub("\r$", ""); print }' Link.cc > unix/Link.cc
+awk '{ sub("\r$", ""); print }' Observer.h > unix/Observer.h
+awk '{ sub("\r$", ""); print }' TextDisplay.cc > unix/TextDisplay.cc
+awk '{ sub("\r$", ""); print }' Graphics.cc > unix/Graphics.cc
+awk '{ sub("\r$", ""); print }' window.cc > unix/window.cc
+awk '{ sub("\r$", ""); print }' Subject.h > unix/Subject.h
+awk '{ sub("\r$", ""); print }' Game.h > unix/Game.h
+awk '{ sub("\r$", ""); print }' Cell.h > unix/Cell.h
+awk '{ sub("\r$", ""); print }' Player.h > unix/Player.h
+awk '{ sub("\r$", ""); print }' Ability.h > unix/Ability.h
+awk '{ sub("\r$", ""); print }' Link.h > unix/Link.h
+awk '{ sub("\r$", ""); print }' TextDisplay.h > unix/TextDisplay.h
+awk '{ sub("\r$", ""); print }' Graphics.h > unix/Graphics.h
+awk '{ sub("\r$", ""); print }' window.h > unix/window.h
+awk '{ sub("\r$", ""); print }' main.cc > unix/main.cc
+cp Makefile unix/
