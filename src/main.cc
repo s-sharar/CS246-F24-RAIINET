@@ -15,6 +15,7 @@
 using namespace std;
 
 const int maxOfEachAbility = 2;
+const int numPlayers = 2; // to quickly change player counts
 
 string randomLinkGenerator();
 void areAbilitiesValid(const string &abilities, const string &validAbilities);
@@ -24,8 +25,11 @@ string retrieveLink(fstream &file);
 int main(int argc, const char* argv[]){
     const string insufficentArguments = "Insufficient arguments provided";
     string validAblities = "LFDSP";
-    string p1AbilityOrder = "LFDSP", p2AbilityOrder = "LFDSP";
-    string linkOrder1 = randomLinkGenerator(), linkOrder2 = randomLinkGenerator();
+    vector<string> playerAbilities(numPlayers, "LFDSP"); // index + 1 represents player number
+    vector<string> playerLinkOrders(numPlayers); // same here
+    for (int i = 0; i < numPlayers; ++i) {
+        playerLinkOrders[i] = randomLinkGenerator();
+    }
     bool graphicsEnabled = false;
     try { 
         for (int i = 1; i < argc; ++i) {
@@ -33,23 +37,23 @@ int main(int argc, const char* argv[]){
             if (arg == "-ability1") {
                 ++i;
                 if (i >= argc) throw out_of_range(insufficentArguments);
-                p1AbilityOrder = string(argv[i]);
-                areAbilitiesValid(p1AbilityOrder, validAblities);
+                playerAbilities[0] = string(argv[i]);
+                areAbilitiesValid(playerAbilities[0], validAblities);
             } else if (arg == "-ability2") {
                 ++i;
                 if (i >= argc) throw out_of_range(insufficentArguments);
-                p2AbilityOrder = string(argv[i]);
-                areAbilitiesValid(p2AbilityOrder, validAblities);                
+                playerAbilities[1] = string(argv[i]);
+                areAbilitiesValid(playerAbilities[1], validAblities);                
             } else if (arg == "-link1") {
                 ++i;
                 if (i >= argc) throw out_of_range(insufficentArguments);
                 ifstream file{argv[i]};
-                linkOrder1 = retrieveLink(file);
+                playerLinkOrders[0] = retrieveLink(file);
             } else if (arg == "-link2") {
                 ++i;
                 if (i >= argc) throw out_of_range(insufficentArguments);
                 ifstream file{argv[i]};
-                linkOrder2 = retrieveLink(file);
+                playerLinkOrders[1] = retrieveLink(file);
             } else if (arg == "graphics") {
                 graphicsEnabled = true;
             } else {
