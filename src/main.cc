@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include "Game.h"
 #include "TextDisplay.h"
+#include "Err.h"
 
 using namespace std;
 
@@ -23,7 +24,6 @@ string retrieveLink(fstream &file);
 
 
 int main(int argc, const char* argv[]){
-    const string insufficentArguments = "Insufficient arguments provided";
     string validAblities = "LFDSP";
     vector<string> playerAbilities(numPlayers, "LFDSP"); // index + 1 represents player number
     vector<string> playerLinkOrders(numPlayers); // same here
@@ -36,31 +36,31 @@ int main(int argc, const char* argv[]){
             string arg = argv[i];
             if (arg == "-ability1") {
                 ++i;
-                if (i >= argc) throw out_of_range(insufficentArguments);
+                if (i >= argc) throw out_of_range(Err::insufficientArgs);
                 playerAbilities[0] = string(argv[i]);
                 areAbilitiesValid(playerAbilities[0], validAblities);
             } else if (arg == "-ability2") {
                 ++i;
-                if (i >= argc) throw out_of_range(insufficentArguments);
+                if (i >= argc) throw out_of_range(Err::insufficientArgs);
                 playerAbilities[1] = string(argv[i]);
                 areAbilitiesValid(playerAbilities[1], validAblities);                
             } else if (arg == "-link1") {
                 ++i;
-                if (i >= argc) throw out_of_range(insufficentArguments);
+                if (i >= argc) throw out_of_range(Err::insufficientArgs);
                 ifstream file{argv[i]};
                 playerLinkOrders[0] = retrieveLink(file);
             } else if (arg == "-link2") {
                 ++i;
-                if (i >= argc) throw out_of_range(insufficentArguments);
+                if (i >= argc) throw out_of_range(Err::insufficientArgs);
                 ifstream file{argv[i]};
                 playerLinkOrders[1] = retrieveLink(file);
             } else if (arg == "graphics") {
                 graphicsEnabled = true;
             } else {
-                throw invalid_argument("Invalid command-line argument provided");
+                throw invalid_argument(Err::invalidCommandLineArg + ": " + string(argv[i]));
             }
         }
-    } catch(exception &e) {
+    } catch(const exception &e) {
         cerr << e.what() << endl;
         return 1;
     }
@@ -91,13 +91,12 @@ void areAbilitiesValid(const string &s, const string &validAbilities) {
         if (mp.find(c) != mp.end() && mp[c] < maxOfEachAbility) {
             ++mp[c];
         } else {
-            throw invalid_argument("Invalid abilities entered");
+            throw invalid_argument(Err::invalidAbilities);
         }
     }
 }
 
 string retrieveLink(ifstream &file) {
-    string errorMessage = "Invalid links provided";
     const int requiredCount = 1;
     vector<string> links = {
         "D1", "D2", "D3", "D4",
@@ -116,12 +115,12 @@ string retrieveLink(ifstream &file) {
             ++mp[s];
             linkOrder += s;
         } else {
-            throw invalid_argument(errorMessage);
+            throw invalid_argument(Err::invalidLinks);
         }
     }
     for (const auto &elem : mp) {
         if (elem.second != requiredCount) {
-            throw invalid_argument(errorMessage);
+            throw invalid_argument(Err::invalidLinks);
         }
     }
     return linkOrder;
