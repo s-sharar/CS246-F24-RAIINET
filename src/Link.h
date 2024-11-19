@@ -2,7 +2,7 @@
 #define LINK_H
 #include <string>
 
-enum LinkType{Data = 'D', Virus = 'V'};
+enum class LinkType{Data = 'D', Virus = 'V'};
 
 class Link {
     char id;

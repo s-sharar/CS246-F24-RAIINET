@@ -49,7 +49,7 @@ void Link::linkBoost() {
 }
 
 void Link::polarise() {
-    t = (t == Data) ? Virus : Data;
+    t = (t == LinkType::Data) ? LinkType::Virus : LinkType::Data;
 }
 
 void Link::scan() {

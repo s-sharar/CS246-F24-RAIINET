@@ -11,19 +11,22 @@
 #include <unordered_map>
 #include "Game.h"
 #include "TextDisplay.h"
+#include "Graphics.h"
 #include "Err.h"
 
 using namespace std;
 
+const int abilitiesLength = 5;
 const int maxOfEachAbility = 2;
 const int numPlayers = 2; // to quickly change player counts
 
 string randomLinkGenerator();
 void areAbilitiesValid(const string &abilities, const string &validAbilities);
-string retrieveLink(fstream &file);
+string retrieveLink(ifstream &file);
 
 
 int main(int argc, const char* argv[]){
+    // Argument checking here
     string validAblities = "LFDSP";
     vector<string> playerAbilities(numPlayers, "LFDSP"); // index + 1 represents player number
     vector<string> playerLinkOrders(numPlayers); // same here
@@ -57,12 +60,51 @@ int main(int argc, const char* argv[]){
             } else if (arg == "graphics") {
                 graphicsEnabled = true;
             } else {
-                throw invalid_argument(Err::invalidCommandLineArg + ": " + string(argv[i]));
+                throw invalid_argument(Err::invalidCommandLineArg + string(argv[i]));
             }
         }
     } catch(const exception &e) {
         cerr << e.what() << endl;
         return 1;
+    }
+
+    // Start of Game Loop
+    shared_ptr<Game> game = make_shared<Game>(numPlayers, playerLinkOrders, playerAbilities, graphicsEnabled);
+    TextObserver t{game};
+    Graphics g{game};
+    ifstream sequenceFile;
+    string command;
+    bool abilityUsedThisTurn = false;
+    while (sequenceFile >> command || cin >> command) {
+        try {
+            if (command == "sequence") {
+                string newFile;
+                cin >> newFile;
+                sequenceFile.close();
+                sequenceFile.clear();
+                sequenceFile.open(newFile);
+                if (!sequenceFile.is_open()) throw runtime_error(Err::invalidFile);
+            } else if (command == "abilities") {
+                game->displayAbilities();
+            } else if (command == "ability") {
+                if (abilityUsedThisTurn) {
+                    throw runtime_error(Err::abilityUsedThisTurn + " " + Err::reenterCommand);
+                }
+                abilityUsedThisTurn = true;
+                int abilityIndex = 0;
+                if (!(sequenceFile.is_open() && !sequenceFile.eof() && sequenceFile >> abilityIndex)) {
+                    if (!(cin >> abilityIndex) || abilityIndex < 1 || abilityIndex > abilitiesLength) {
+                        throw runtime_error(Err::invalidAbilityIndex);
+                    }
+                }
+                string abilityName = game->
+            } else {
+
+            }
+        } catch(const exception &e) {
+            cerr << e.what() << endl;
+            continue;
+        }
     }
 }
 
@@ -75,13 +117,14 @@ string randomLinkGenerator() {
     mt19937 rng(rd()); 
     shuffle(links.begin(), links.end(), rng);
     string linkOrder;
-    for (const auto& link : links) {
+    for (const auto &link : links) {
         linkOrder += link;
     }
     return linkOrder;
 }
 
 void areAbilitiesValid(const string &s, const string &validAbilities) {
+    if (s.length() != abilitiesLength) throw(Err::invalidAbilities);
     unordered_map<char, int> mp;
     for (int i = 0; i < validAbilities.size(); ++i) {
         mp[validAbilities[i]] = 0;

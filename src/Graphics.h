@@ -6,5 +6,12 @@
 #include <vector>
 #include <memory>
 
+class Graphics : public Observer {
+    weak_ptr<Game> game;
+    public:
+    Graphics(shared_ptr<Game> &game);
+    void notify() override;
+};
+
 
 #endif
