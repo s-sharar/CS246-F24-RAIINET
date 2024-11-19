@@ -7,4 +7,13 @@
 #include "Subject.h"
 #include "Player.h"
 
+using namespace std;
+
+class TextObserver : public Observer {
+    weak_ptr<Game> game;
+    public:
+    TextObserver(shared_ptr<Game> &g);
+    void notify() override;
+};
+
 #endif
