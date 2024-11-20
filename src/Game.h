@@ -23,7 +23,7 @@ class Game : public Subject {
     Game(int playerCount, const vector<string> &linkOrders, const vector<string> &abilities, bool graphicsEnabled);
     void move(char link, const string &direction);
     void displayAbilities() const;
-    string getAbilityName(int index);
+    string getAbilityName(int index) const;
     void useAbility(int row, int col);
     void useAbility(const string &abilityName, char link);
     void useFireWall(int row, int col);
@@ -31,6 +31,9 @@ class Game : public Subject {
     void useLinkBoost(char link);
     void usePolarise(char link);
     void useScan(char link);
+    void useImprison(int row, int col);
+    void useCorrupt(char link);
+    void useTelport(pair<int, int> coord1, pair<int. int> coord2);
 };
 
 
