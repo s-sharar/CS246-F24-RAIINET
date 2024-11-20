@@ -14,7 +14,13 @@ class Err {
     static string invalidAbilities;
     static string invalidAbility;
     static string invalidAbilityIndex;
+    static string expectedCoordinatesForFireWall;
+    static string expectedLinkIdentity;
+    static string invalidCoordinates;
     static string invalidLinks;
+    static string invalidLink;
+    static string expectedLinkAndDir;
+    static string invalidDirection;
     static string invalidFile;
     static string abilityUsedThisTurn;
     static string reenterCommand;

@@ -2,7 +2,7 @@
 
 const int numCol = 8;
 
-Board::Board(int playerCount) : size{playerCount == 2 ? 8 : 10} {
+Board::Board(int numRow) : size{numRow} {
     grid.resize(size);
     for (int i = 0; i < size; ++i) {
         grid[i].resize(numCol);
@@ -12,9 +12,14 @@ Board::Board(int playerCount) : size{playerCount == 2 ? 8 : 10} {
     }
 }
 
-Cell& Board::getCell(int row, int col) {
+Cell& Board::getCell(int row, int col){
     if (row < size && col < numCol) {
         return grid[row][col];
     }
     throw std::out_of_range("Cell coordinates out of bounds");
 }
+
+int Board::getSize() const {
+    return size;
+}
+

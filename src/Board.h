@@ -9,8 +9,11 @@ private:
     std::vector<std::vector<Cell>> grid;
     int size;
 public:
-    Board(int playerCount);
+    Board(int numRow);
     Cell& getCell(int row, int col);
+    int getSize() const;
+    void setCell(int row, int col);
+
 };
 
 #endif

@@ -3,8 +3,7 @@
 #include <string>
 #include <memory>
 
-class Cell {
-private:
+struct Cell {
     int row;
     int col;
     char c;
@@ -12,14 +11,9 @@ private:
     int whichPlayersFirewall = 0; // 0 refers to no player
     bool serverPort = false;
     int whichPlayersServerPort = 0;
-public:
     Cell(int row, int col);
-    int getRow() const;
-    int getCol() const;
-    char getChar() const;
     bool hasOwnFirewall(int playerNumber) const;
     bool hasOpponnentFirewall(int playerNumber) const;
-    void setFirewall(int playerNumber, bool status);
     bool isOwnServerPort(int playerNumber) const;
     bool isOpponentServerPort(int playerNumber) const;
     bool isEmpty() const;

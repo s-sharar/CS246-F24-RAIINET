@@ -3,8 +3,6 @@
 #include <sstream>
 #include <string>
 #include <stdexcept>
-#include <chrono>
-#include <thread>
 #include <memory>
 #include <algorithm>
 #include <random>
@@ -75,31 +73,57 @@ int main(int argc, const char* argv[]){
     ifstream sequenceFile;
     string command;
     bool abilityUsedThisTurn = false;
-    while (sequenceFile >> command || cin >> command) {
+    istream *in = &cin; // using pointer to make input simple
+    while (true) {
+        if (!(*in >> command)) {
+            if (in == &sequenceFile) {
+                sequenceFile.close();
+                in = &cin;
+                continue;
+            } else {
+                break; // EOF detected from cin
+            }
+        }
         try {
             if (command == "sequence") {
                 string newFile;
-                cin >> newFile;
+                if (!(*in >> newFile))
                 sequenceFile.close();
                 sequenceFile.clear();
                 sequenceFile.open(newFile);
                 if (!sequenceFile.is_open()) throw runtime_error(Err::invalidFile);
+                in = &sequenceFile;
             } else if (command == "abilities") {
                 game->displayAbilities();
             } else if (command == "ability") {
                 if (abilityUsedThisTurn) {
-                    throw runtime_error(Err::abilityUsedThisTurn + " " + Err::reenterCommand);
+                    throw runtime_error(Err::abilityUsedThisTurn);
+                }
+                int abilityIndex = 0;
+                if (!(*in >> abilityIndex)) throw runtime_error(Err::invalidAbilityIndex);
+                string abilityName = game->getAbilityName(abilityIndex);
+                if (abilityName == "Firewall") {
+                    int row, col;
+                    if (!(*in >> row >> col)) throw runtime_error(Err::expectedCoordinatesForFireWall);
+                    game->useAbility(row, col);
+                } else {
+                    char c;
+                    if (!(*in >> c)) throw runtime_error(Err::expectedLinkIdentity);
+                    game->useAbility(abilityName, c);
                 }
                 abilityUsedThisTurn = true;
-                int abilityIndex = 0;
-                if (!(sequenceFile.is_open() && !sequenceFile.eof() && sequenceFile >> abilityIndex)) {
-                    if (!(cin >> abilityIndex) || abilityIndex < 1 || abilityIndex > abilitiesLength) {
-                        throw runtime_error(Err::invalidAbilityIndex);
-                    }
-                }
-                string abilityName = game->
+            } else if (command == "board") {
+                game->notifyObservers();
+            } else if (command == "quit") {
+                break;
+            } else if (command == "move") {
+                char c;
+                string direction;
+                if (!(*in >> c >> direction)) throw runtime_error(Err::expectedLinkAndDir);
+                game->move(c, direction);
+                abilityUsedThisTurn = false;
             } else {
-
+                throw runtime_error(Err::invalidRuntimeCommand);
             }
         } catch(const exception &e) {
             cerr << e.what() << endl;
