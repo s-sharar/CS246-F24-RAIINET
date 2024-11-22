@@ -7,6 +7,7 @@ const int Player2 = 2;
 const int Player3 = 3;
 const int Player4 = 4;
 const char ServerPortChar = 'S';
+const int numPlayers = 2;
 
 Cell::Cell(int row, int col, int size) : row{row}, col{col}, size{size}, c{'\0'} {
     int shift = (size == 10) ? - 1 : 0;
@@ -22,9 +23,9 @@ Cell::Cell(int row, int col, int size) : row{row}, col{col}, size{size}, c{'\0'}
 
     if ((col == serverPortCoord) || (col == serverPortCoord + 1)) {
         if (row == 0) whichPlayersServerPort = Player1;
-        if (row == size - 1) whichPlayersServerPort = Player1;
+        if (row == size - 1) whichPlayersServerPort = Player2;
         c = '.';
-    } else if ((row == serverPortCoord) || (row == serverPortCoord + 1)) {
+    } else if (((row == serverPortCoord) || (row == serverPortCoord + 1)) && (numPlayers > 2)) {
         if (col == 0) whichPlayersServerPort = Player3;
         if (col == size - 1) whichPlayersServerPort = Player4;
         c = '.';
@@ -36,9 +37,9 @@ Cell::Cell(int row, int col, int size) : row{row}, col{col}, size{size}, c{'\0'}
     } else if (((row == size - 1) && (col < serverPortCoord)) || ((row == size - 2) && (col >= serverPortCoord) && (col <= serverPortCoord + 1)) || ((row == size - 1) && (col > serverPortCoord + 1))) {
     	c = ('A' + col + shift);
     } else if ((((col == 0) && (row < serverPortCoord)) || ((col == 1) && (row >= serverPortCoord) && (row <= serverPortCoord + 1)) || ((col == 0) && (row > serverPortCoord + 1))) && (size == 10)) {
-    	c = ('s' + row + shift);
+    	c = ('i' + row + shift);
     } else if ((((col == size - 1) && (row < serverPortCoord)) || ((col == size - 2) && (row >= serverPortCoord) && (row <= serverPortCoord + 1)) || ((col == size - 1) && (row > serverPortCoord + 1))) && (size == 10)) {
-    	c = ('S' + row + shift);
+    	c = ('I' + row + shift);
     } else {
         c = '.';
     }
