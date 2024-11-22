@@ -11,7 +11,9 @@ class Cell {
     int whichPlayersServerPort = 0; // same
     bool locked;
     public:
+    Cell() {}
     Cell(int row, int col);
+    Cell(const Cell &other);
     bool hasFirewall() const;
     bool hasOwnFirewall(int playerNumber) const;
     bool hasOpponnentFirewall(int playerNumber) const;

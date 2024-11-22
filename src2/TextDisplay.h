@@ -13,7 +13,7 @@ class TextObserver : public Observer {
     int playerNumber;
     ostream &out;
     public:
-    TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber = 0);
+    TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber);
     void notify() override;
 };
 

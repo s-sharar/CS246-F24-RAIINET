@@ -98,7 +98,7 @@ void Game::move(char link, const string &direction) {
     // TODO: check if trying to move a trapped link
     
     // get cords of cell we're moving to
-    int newRow, newCol;
+    int newRow = 0, newCol = 0;
     getNewCords(newRow, newCol, currLink, direction);
     
     // check in bounds
@@ -194,7 +194,7 @@ void Game::move(char link, const string &direction) {
         currLink->setRow(newRow);
         currLink->setCol(newCol);
     }
-    
+    currentTurn = (currentTurn % playerCount) + 1;
     checkGameOver();
     notifyObservers();
 }
@@ -322,6 +322,8 @@ bool validDirection(const string &direction) {
 }
 
 void Game::battle(shared_ptr<Link> currLink, shared_ptr<Link> oppLink, int opponentIndex, Cell &cell) {
+    currLink->setIsVisible(true);
+    oppLink->setIsVisible(true);
     int currStrength = currLink->getStrength();
     int oppStrength = oppLink->getStrength();
     int playerIndex = currentTurn - 1;
@@ -346,10 +348,22 @@ void Game::battle(shared_ptr<Link> currLink, shared_ptr<Link> oppLink, int oppon
 
 void getNewCords(int &row, int &col, shared_ptr<Link> &moveLink, const string &direction) {
     int increment = moveLink->getStepSize();
-    if (direction == "up") row = moveLink->getRow() - increment;
-    else if (direction == "down") row = moveLink->getRow() + increment;
-    else if (direction == "left") col = moveLink->getCol() - increment;
-    else col = moveLink->getCol() + increment;
+    if (direction == "up") {
+        row = moveLink->getRow() - increment;
+        col = moveLink->getCol();
+    }
+    else if (direction == "down") {
+        row = moveLink->getRow() + increment;
+        col = moveLink->getCol();
+    }
+    else if (direction == "left") {
+        col = moveLink->getCol() - increment;
+        row = moveLink->getRow();
+    }
+    else {
+        col = moveLink->getCol() + increment;
+        row = moveLink->getRow();
+    }
 }
 
 bool Game::validOutOfBounds(int row, int col) const {

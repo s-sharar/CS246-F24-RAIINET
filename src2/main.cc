@@ -68,8 +68,11 @@ int main(int argc, const char* argv[]){
 
     // Start of Game Loop
     shared_ptr<Game> game = make_shared<Game>(numPlayers, playerLinkOrders, playerAbilities, graphicsEnabled);
-    TextObserver t{game};
-    Graphics g{game};
+    weak_ptr<Game> g = game;
+    shared_ptr<TextObserver> t = make_shared<TextObserver>(g, cout, 1);
+    shared_ptr<TextObserver> t2 = make_shared<TextObserver>(g, cout, 2);
+    game->attach(t);
+    game->attach(t2);
     ifstream sequenceFile;
     string command;
     bool abilityUsedThisTurn = false;
@@ -94,7 +97,7 @@ int main(int argc, const char* argv[]){
                 if (!sequenceFile.is_open()) throw runtime_error(Err::invalidFile);
                 in = &sequenceFile;
             } else if (command == "abilities") {
-                game->displayAbilities();
+                // game->displayAbilities();
             } else if (command == "ability") {
                 if (abilityUsedThisTurn) {
                     throw runtime_error(Err::abilityUsedThisTurn);

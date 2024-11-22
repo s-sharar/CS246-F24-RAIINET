@@ -24,7 +24,7 @@ string Err::abilityUsedThisTurn = "You may only use one ability per turn. You mu
 string Err::isAlreadyBoosted = "This link has already been boosted!";
 string Err::isAlreadyDownloaded = "This link has already been downloaded!";
 string Err::isAlreadyVisible = "This link is already visible!";
-string cannotPlaceFirewallOnSP = "You cannot place a firewall on a server port!";
+string Err::cannotPlaceFirewallOnSP = "You cannot place a firewall on a server port!";
 string Err::cannotPlaceFirewallOnFw = "You cannot place a firewall on another firewall!";
 string Err::cannotPlaceFirewallDirectlyOnOpp = "You cannot place a firewall directly on your opponent's link!";
 

@@ -1,12 +1,17 @@
 #include "Board.h"
 #include "Err.h"
+#include <stdexcept>
+#include <iostream>
 
 const int numCol = 8;
 
 Board::Board(int numRow) : size{numRow} {
+    grid.resize(size);
     for (int i = 0; i < size; ++i) {
+        grid[i].resize(size);
         for (int j = 0; j < numCol; ++j) {
-            grid[i].emplace_back(Cell(i, j));
+            Cell c{i, j};
+            grid[i][j] = c;
         }
     }
 }
