@@ -29,7 +29,7 @@ Ability::Ability(char code, int id) : id{id}, isActivated{false} {
             case 'U':   
                 ability = Abilities::Undecided;
                 break;
-            default: throw(Err::invalidAbility, ", hence " + std::to_string(code) + " is invalid.");
+            default: throw(Err::invalidAbility + ", hence " + std::to_string(code) + " is invalid.");
         }
 }
 

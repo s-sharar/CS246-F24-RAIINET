@@ -153,10 +153,10 @@ string randomLinkGenerator() {
 void areAbilitiesValid(const string &s, const string &validAbilities) {
     if (s.length() != abilitiesLength) throw(Err::invalidAbilities);
     unordered_map<char, int> mp;
-    for (int i = 0; i < validAbilities.size(); ++i) {
+    for (size_t i = 0; i < validAbilities.size(); ++i) {
         mp[validAbilities[i]] = 0;
     }
-    for (int i = 0; i < s.size(); ++i) {
+    for (size_t i = 0; i < s.size(); ++i) {
         char c = toupper(s[i]);
         if (mp.find(c) != mp.end() && mp[c] < maxOfEachAbility) {
             ++mp[c];
@@ -173,7 +173,7 @@ string retrieveLink(ifstream &file) {
         "V1", "V2", "V3", "V4"
     };
     unordered_map<string, int> mp;
-    for (int i = 0; i < links.size(); ++i) {
+    for (size_t i = 0; i < links.size(); ++i) {
         mp[links[i]] = 0;
     }
     string s, linkOrder;

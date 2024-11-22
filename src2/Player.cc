@@ -12,12 +12,12 @@ const int serverPortEnd = 10;
 const int p1BaseRow = 0;
 const int p2BaseRow = 7;
 
-Player::Player(const string &linksString, const string &abilitiesString, int id) : id{id}, numOfDataDownloaded{0}, numOfVirusDownloaded{0}, abilityCount{abilitiesString.length()} {
+Player::Player(const string &linksString, const string &abilitiesString, int id) : id{id}, numOfDataDownloaded{0}, numOfVirusDownloaded{0}, abilityCount{static_cast<int>(abilitiesString.length())} {
     // Assume links and abilities passed are valid since they are checked in main.
     char baseChar = (id == 1) ? 'a' : 'A';
     int row = (id == 1) ? p1BaseRow : p2BaseRow;
     int col = 0;
-    for (int i = 0; i < linksString.length(); i += individualLinkLength) {
+    for (size_t i = 0; i < linksString.length(); i += individualLinkLength) {
         bool isServerPort = i >= serverPortStart && i < serverPortEnd;
         LinkType linkType = linksString[i] == 'D' ? LinkType::Data : LinkType::Virus;
         int strength = linksString[i + 1] - '0';
@@ -31,7 +31,7 @@ Player::Player(const string &linksString, const string &abilitiesString, int id)
         links.emplace_back(make_shared<Link>(linkID, linkType, strength, linkRow, col));
         ++col;
     }
-    for (int i = 0; i < abilities.size(); ++i) {
+    for (size_t i = 0; i < abilities.size(); ++i) {
         abilities.emplace_back(make_shared<Ability>(abilitiesString[i], i + 1));
     }
 }
@@ -74,7 +74,7 @@ void Player::setEliminated(bool b) {
 }
 
 shared_ptr<Ability> Player::getAbility(int abilityNumber) {
-    if (abilityNumber > abilities.size()) throw runtime_error(Err::invalidAbilityIndex);
+    if (abilityNumber > static_cast<int>(abilities.size())) throw runtime_error(Err::invalidAbilityIndex);
     return abilities[abilityNumber - 1];
 }
 
