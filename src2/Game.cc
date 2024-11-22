@@ -262,10 +262,6 @@ void Game::useDownload(char link) {
 
 
 void Game::usePolarise(char link) {
-    // get player indices
-    int playerIndex = currentTurn - 1;
-    int otherPlayerIndex = playerIndex == 0 ? 1 : 0;
-
     // get the link to be polarised
     shared_ptr<Link> currLink;
     for (int i = 0; i < playerCount; ++i) {
