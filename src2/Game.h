@@ -17,6 +17,7 @@ class Game : public Subject {
     shared_ptr<Board> board;
     vector<shared_ptr<Player>> players;
     const int playerCount;
+    int activePlayers;
     int currentTurn = 1;
     bool gameOver = false;
     int playerWon = 0;

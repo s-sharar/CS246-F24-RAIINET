@@ -6,13 +6,14 @@
 class Cell {
     int row;
     int col;
+    int size;
     char c;
     int whichPlayersFirewall = 0; // 0 refers to no player
     int whichPlayersServerPort = 0; // same
     bool locked;
     public:
     Cell() {}
-    Cell(int row, int col);
+    Cell(int row, int col, int size);
     Cell(const Cell &other);
     bool hasFirewall() const;
     bool hasOwnFirewall(int playerNumber) const;
@@ -25,6 +26,7 @@ class Cell {
     int getRow() const;
     int getCol() const;
     int getPlayersServerPort() const;
+    int getPlayersFirewall() const;
     char getContent() const;
     void setContent(char content);
     void setFirewall(int playerNumber, bool status);

@@ -37,7 +37,7 @@ bool validDirection(const string &direction);
 void getNewCords(int &row, int &col, shared_ptr<Link> &moveLink, const string &direction);
 
 
-Game::Game(int playerCount, const vector<string> &linkOrders, const vector<string> &abilities, bool graphicsEnabled) : playerCount{playerCount}, graphicsEnabled{graphicsEnabled} {
+Game::Game(int playerCount, const vector<string> &linkOrders, const vector<string> &abilities, bool graphicsEnabled) : playerCount{playerCount}, activePlayers{playerCount}, graphicsEnabled{graphicsEnabled} {
     const int numRow = (playerCount == 2) ? 8 : 10;
     board = make_shared<Board>(numRow);
     for (int i = 0; i < playerCount; ++i) {
@@ -122,6 +122,7 @@ void Game::move(char link, const string &direction) {
     if (newCell.isOwnServerPort(currentTurn)) throw runtime_error(Err::cannotDownloadOwnLink(true));
     // self link
     if (validPiLink(newCell.getContent(), currentTurn)) throw runtime_error(Err::cannotMoveOntoOwnLink);
+
     // Validations done
     
     // set the cell that the link is being moved from to '.'
@@ -130,8 +131,14 @@ void Game::move(char link, const string &direction) {
     // moving into an opponent's server port
     if (newCell.isServerPort()) {
         int opponentIndex = newCell.getPlayersServerPort() - 1;
-        currLink->download();
-        players[opponentIndex]->download(currLink);
+        if (!(players[opponentIndex]->getEliminated())) { // only download if player not eliminated
+            currLink->download();
+            players[opponentIndex]->download(currLink);
+        } else { // moving onto serverport of eliminated player
+            newCell.setContent(currLink->getId());
+            currLink->setRow(newRow);
+            currLink->setCol(newCol);
+        }
     } 
     
     // moving into a firewall
@@ -148,8 +155,15 @@ void Game::move(char link, const string &direction) {
                 for (int i = 0; i < playerCount; ++i) {
                     if (validPiLink(content, i + 1)) opponentIndex = i;
                 }
-                shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
-                battle(currLink, opponentLink, opponentIndex, newCell);
+                if (!(players[opponentIndex]->getEliminated())) { // if moving onto link of non-eliminated player
+                    shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
+                    battle(currLink, opponentLink, opponentIndex, newCell);
+                    // maybe additional logic
+                } else { // if moving onto link of eliminated player
+                    newCell.setContent(currLink->getId());
+                    currLink->setRow(newRow);
+                    currLink->setCol(newCol);
+                }
                 // maybe additional logic
             }
         }
@@ -170,8 +184,16 @@ void Game::move(char link, const string &direction) {
                     for (int i = 0; i < playerCount; ++i) {
                         if (validPiLink(content, i + 1)) opponentIndex = i;
                     }
-                    shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
-                    battle(currLink, opponentLink, opponentIndex, newCell);
+                    
+                    if (!(players[opponentIndex]->getEliminated())) { // if moving onto link of non-eliminated player
+                        shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
+                        battle(currLink, opponentLink, opponentIndex, newCell);
+                    
+                    } else { // if moving onto link of eliminated player
+                        newCell.setContent(currLink->getId());
+                        currLink->setRow(newRow);
+                        currLink->setCol(newCol);
+                    }
                     // maybe additional logic
                 }
             }
@@ -184,8 +206,15 @@ void Game::move(char link, const string &direction) {
         for (int i = 0; i < playerCount; ++i) {
             if (validPiLink(content, i + 1)) opponentIndex = i;
         }
-        shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
-        battle(currLink, opponentLink, opponentIndex, newCell);
+
+        if (!(players[opponentIndex]->getEliminated())) { // if moving onto link of non-eliminated player
+            shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
+            battle(currLink, opponentLink, opponentIndex, newCell);
+        } else { // if moving onto link of eliminated player
+            newCell.setContent(currLink->getId());
+            currLink->setRow(newRow);
+            currLink->setCol(newCol);
+        }
         // maybe additional logic
     
     // moving into an empty cell
@@ -194,7 +223,12 @@ void Game::move(char link, const string &direction) {
         currLink->setRow(newRow);
         currLink->setCol(newCol);
     }
-    currentTurn = (currentTurn % playerCount) + 1;
+
+    // finds next player turn, who is currently active
+    for (int i = 0; i < playerCount; ++i) {
+        currentTurn = (currentTurn % playerCount) + 1;
+        if (isActive(currentTurn)) break;
+    }
     checkGameOver();
     // notifyObservers();
 }
@@ -299,7 +333,9 @@ void Game::checkGameOver() {
         if (players[i]->getVirusDownloaded() >= gameOverCondition) {
             
             if (playerCount > 2) {
-                //... remove firewall, remove links, remove 
+                players[i]->setEliminated(true);
+                --activePlayers;
+                gameOver = (activePlayers > 1) ? false : true;
             } else {
                 gameOver = true;
                 playerWon = (i == 0) ? player2 : player1;
