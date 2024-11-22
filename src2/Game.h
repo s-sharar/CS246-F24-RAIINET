@@ -39,6 +39,7 @@ class Game : public Subject {
     bool isActive(int playeri) const;
     const shared_ptr<Player>& getPlayer(int playerNumber) const;
     shared_ptr<Board> getBoard() const;
+    int getCurrentTurn() const;
 };
 
 

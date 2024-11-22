@@ -313,6 +313,10 @@ void Game::checkGameOver() {
     }
 }
 
+int Game::getCurrentTurn() const {
+    return currentTurn;
+}
+
 bool validLink(char link) {
     return validP1Link(link) || validP2Link(link) || validP3Link(link) || validP4Link(link);
 }
