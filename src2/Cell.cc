@@ -25,6 +25,8 @@ Cell::Cell(int row, int col)
     }
 }
 
+Cell::Cell(const Cell &other) : row{other.row}, col{other.col}, c{other.c}, whichPlayersFirewall{0}, whichPlayersServerPort{other.whichPlayersServerPort}, locked{other.locked} {}
+
 int Cell::getRow() const {
     return row;
 }

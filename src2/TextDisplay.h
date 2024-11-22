@@ -10,10 +10,10 @@ using namespace std;
 
 class TextObserver : public Observer {
     weak_ptr<Game> g;
-    int playerNumber;
     ostream &out;
+    int playerNumber;
     public:
-    TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber = 0);
+    TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber);
     void notify() override;
 };
 

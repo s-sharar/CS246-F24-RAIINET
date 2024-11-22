@@ -7,14 +7,14 @@
 
 ########## Variables ##########
 
-CXX = clang++					# compiler
+CXX = g++-11				# compiler
 CXXFLAGS = -std=c++20 -g -Wall -Werror=vla -MMD		# compiler flags
 MAKEFILE_NAME = ${firstword ${MAKEFILE_LIST}}	# makefile name
 
 SOURCES = $(wildcard *.cc)			# source files (*.cc)
 OBJECTS = ${SOURCES:.cc=.o}			# object files forming executable
 DEPENDS = ${OBJECTS:.o=.d}			# substitute ".o" with ".d"
-EXEC = a4q3					# executable name
+EXEC = Raiinet				# executable name
 
 ########## Targets ##########
 

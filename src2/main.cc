@@ -68,8 +68,11 @@ int main(int argc, const char* argv[]){
 
     // Start of Game Loop
     shared_ptr<Game> game = make_shared<Game>(numPlayers, playerLinkOrders, playerAbilities, graphicsEnabled);
-    TextObserver t{game};
-    Graphics g{game};
+    weak_ptr<Game> g = game;
+    shared_ptr<TextObserver> t = make_shared<TextObserver>(g, cout, 1);
+    shared_ptr<TextObserver> t2 = make_shared<TextObserver>(g, cout, 2);
+    game->attach(t);
+    game->attach(t2);
     ifstream sequenceFile;
     string command;
     bool abilityUsedThisTurn = false;
@@ -94,7 +97,7 @@ int main(int argc, const char* argv[]){
                 if (!sequenceFile.is_open()) throw runtime_error(Err::invalidFile);
                 in = &sequenceFile;
             } else if (command == "abilities") {
-                game->displayAbilities();
+                // game->displayAbilities();
             } else if (command == "ability") {
                 if (abilityUsedThisTurn) {
                     throw runtime_error(Err::abilityUsedThisTurn);
@@ -150,10 +153,10 @@ string randomLinkGenerator() {
 void areAbilitiesValid(const string &s, const string &validAbilities) {
     if (s.length() != abilitiesLength) throw(Err::invalidAbilities);
     unordered_map<char, int> mp;
-    for (int i = 0; i < validAbilities.size(); ++i) {
+    for (size_t i = 0; i < validAbilities.size(); ++i) {
         mp[validAbilities[i]] = 0;
     }
-    for (int i = 0; i < s.size(); ++i) {
+    for (size_t i = 0; i < s.size(); ++i) {
         char c = toupper(s[i]);
         if (mp.find(c) != mp.end() && mp[c] < maxOfEachAbility) {
             ++mp[c];
@@ -170,7 +173,7 @@ string retrieveLink(ifstream &file) {
         "V1", "V2", "V3", "V4"
     };
     unordered_map<string, int> mp;
-    for (int i = 0; i < links.size(); ++i) {
+    for (size_t i = 0; i < links.size(); ++i) {
         mp[links[i]] = 0;
     }
     string s, linkOrder;

@@ -61,7 +61,7 @@ void Game::useAbility(int abilityNumber, int row, int col) {
     useFirewall(row, col);
     ability->useAbility();
     checkGameOver();
-    notifyObservers();
+    //notifyObservers();
 }
 
 void Game::useAbility(int abilityNumber, const string &abilityName, char link) {
@@ -80,7 +80,7 @@ void Game::useAbility(int abilityNumber, const string &abilityName, char link) {
     }
     ability->useAbility();
     checkGameOver();
-    notifyObservers();
+    //notifyObservers();
 }
 
 void Game::move(char link, const string &direction) {
@@ -98,7 +98,7 @@ void Game::move(char link, const string &direction) {
     // TODO: check if trying to move a trapped link
     
     // get cords of cell we're moving to
-    int newRow, newCol;
+    int newRow = 0, newCol = 0;
     getNewCords(newRow, newCol, currLink, direction);
     
     // check in bounds
@@ -110,7 +110,7 @@ void Game::move(char link, const string &direction) {
         currLink->download();
         players[playerIndex]->download(currLink);
         checkGameOver();
-        notifyObservers();
+        // notifyObservers();
         return;
     }
     // if bounds are valid, get the cells and see if it's self server port or contains self link
@@ -194,9 +194,9 @@ void Game::move(char link, const string &direction) {
         currLink->setRow(newRow);
         currLink->setCol(newCol);
     }
-    
+    currentTurn = (currentTurn % playerCount) + 1;
     checkGameOver();
-    notifyObservers();
+    // notifyObservers();
 }
 
 void Game::useFirewall(int row, int col) {
@@ -262,10 +262,6 @@ void Game::useDownload(char link) {
 
 
 void Game::usePolarise(char link) {
-    // get player indices
-    int playerIndex = currentTurn - 1;
-    int otherPlayerIndex = playerIndex == 0 ? 1 : 0;
-
     // get the link to be polarised
     shared_ptr<Link> currLink;
     for (int i = 0; i < playerCount; ++i) {
@@ -313,6 +309,10 @@ void Game::checkGameOver() {
     }
 }
 
+int Game::getCurrentTurn() const {
+    return currentTurn;
+}
+
 bool validLink(char link) {
     return validP1Link(link) || validP2Link(link) || validP3Link(link) || validP4Link(link);
 }
@@ -322,6 +322,8 @@ bool validDirection(const string &direction) {
 }
 
 void Game::battle(shared_ptr<Link> currLink, shared_ptr<Link> oppLink, int opponentIndex, Cell &cell) {
+    currLink->setIsVisible(true);
+    oppLink->setIsVisible(true);
     int currStrength = currLink->getStrength();
     int oppStrength = oppLink->getStrength();
     int playerIndex = currentTurn - 1;
@@ -346,10 +348,22 @@ void Game::battle(shared_ptr<Link> currLink, shared_ptr<Link> oppLink, int oppon
 
 void getNewCords(int &row, int &col, shared_ptr<Link> &moveLink, const string &direction) {
     int increment = moveLink->getStepSize();
-    if (direction == "up") row = moveLink->getRow() - increment;
-    else if (direction == "down") row = moveLink->getRow() + increment;
-    else if (direction == "left") col = moveLink->getCol() - increment;
-    else col = moveLink->getCol() + increment;
+    if (direction == "up") {
+        row = moveLink->getRow() - increment;
+        col = moveLink->getCol();
+    }
+    else if (direction == "down") {
+        row = moveLink->getRow() + increment;
+        col = moveLink->getCol();
+    }
+    else if (direction == "left") {
+        col = moveLink->getCol() - increment;
+        row = moveLink->getRow();
+    }
+    else {
+        col = moveLink->getCol() + increment;
+        row = moveLink->getRow();
+    }
 }
 
 bool Game::validOutOfBounds(int row, int col) const {
