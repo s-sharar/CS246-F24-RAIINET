@@ -21,6 +21,7 @@ TextObserver::TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber) : 
 void TextObserver::notify() {
     shared_ptr<Game> game;
     if (!(game = g.lock())) return;
+    out << "Player " << game->getCurrentTurn() << "'s turn" << endl;
     if (playerNumber == player1) {
         out << "Player " << playerNumber << ":" << endl;
         auto &player = game->getPlayer(playerNumber);
