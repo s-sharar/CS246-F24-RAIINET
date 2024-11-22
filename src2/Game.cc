@@ -61,7 +61,7 @@ void Game::useAbility(int abilityNumber, int row, int col) {
     useFirewall(row, col);
     ability->useAbility();
     checkGameOver();
-    notifyObservers();
+    //notifyObservers();
 }
 
 void Game::useAbility(int abilityNumber, const string &abilityName, char link) {
@@ -80,7 +80,7 @@ void Game::useAbility(int abilityNumber, const string &abilityName, char link) {
     }
     ability->useAbility();
     checkGameOver();
-    notifyObservers();
+    //notifyObservers();
 }
 
 void Game::move(char link, const string &direction) {
@@ -110,7 +110,7 @@ void Game::move(char link, const string &direction) {
         currLink->download();
         players[playerIndex]->download(currLink);
         checkGameOver();
-        notifyObservers();
+        // notifyObservers();
         return;
     }
     // if bounds are valid, get the cells and see if it's self server port or contains self link
@@ -196,7 +196,7 @@ void Game::move(char link, const string &direction) {
     }
     currentTurn = (currentTurn % playerCount) + 1;
     checkGameOver();
-    notifyObservers();
+    // notifyObservers();
 }
 
 void Game::useFirewall(int row, int col) {
