@@ -11,6 +11,7 @@ const int serverPortStart = 6;
 const int serverPortEnd = 10;
 const int p1BaseRow = 0;
 const int p2BaseRow = 7;
+const int maxAbilityCount = 5;
 
 Player::Player(const string &linksString, const string &abilitiesString, int id) : id{id}, numOfDataDownloaded{0}, numOfVirusDownloaded{0}, abilityCount{static_cast<int>(abilitiesString.length())} {
     // Assume links and abilities passed are valid since they are checked in main.
@@ -31,12 +32,13 @@ Player::Player(const string &linksString, const string &abilitiesString, int id)
         links.emplace_back(make_shared<Link>(linkID, linkType, strength, linkRow, col));
         ++col;
     }
-    for (size_t i = 0; i < abilities.size(); ++i) {
+    for (int i = 0; i < maxAbilityCount; ++i) {
         abilities.emplace_back(make_shared<Ability>(abilitiesString[i], i + 1));
     }
 }
 
 string Player::getAbilityName(int i) {
+    // issue is here, abilities does not exist
     return abilities[i - 1]->getAbilityName();
 }
 
