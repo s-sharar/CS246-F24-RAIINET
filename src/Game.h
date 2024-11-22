@@ -26,19 +26,13 @@ class Game : public Subject {
     void move(char link, const string &direction);
     void displayAbilities() const;
     string getAbilityName(int index);
-    void useAbility(int abilityNumber, int row, int col);
-    void useAbility(int abilityNumber, const string &abilityName, char link);
-    void useFirewall(int row, int col);
+    void useAbility(int row, int col);
+    void useAbility(const string &abilityName, char link);
+    void useFireWall(int row, int col);
     void useDownload(char link);
     void useLinkBoost(char link);
     void usePolarise(char link);
     void useScan(char link);
-    void battle(shared_ptr<Link> currLink, shared_ptr<Link> opponentLink, int opponentIndex, Cell &cell);
-    void checkGameOver();
-    bool validOutOfBounds(int row, int col) const;
-    bool isActive(int playeri) const;
-    const shared_ptr<Player>& getPlayer(int playerNumber) const;
-    shared_ptr<Board> getBoard() const;
 };
 
 
