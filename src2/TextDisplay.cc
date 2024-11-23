@@ -12,6 +12,7 @@ const char p2Firewall = 'w';
 const char p1BaseChar = 'a';
 const char p2BaseChar = 'A';
 const char serverPort = 'S';
+const char teleportChar = '*';
 
 using namespace std;
 
@@ -49,8 +50,10 @@ void TextObserver::notify() {
                     out << serverPort;
                 } else if (!cell.isEmpty()) {
                     out << cell.getContent();
-                } else if (cell.hasOwnFirewall(player1)){
+                } else if (cell.hasOwnFirewall(player1)) {
                     out << p1Firewall;
+                } else if (cell.getTeleport()) {
+                    out << teleportChar;
                 } else {
                     out << cell.getContent();
                 }
@@ -108,6 +111,8 @@ void TextObserver::notify() {
                     out << cell.getContent();
                 } else if (cell.hasOwnFirewall(player2)){
                     out << p2Firewall;
+                } else if (cell.getTeleport()) {
+                    out << teleportChar;
                 } else {
                     out << cell.getContent();
                 }
