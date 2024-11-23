@@ -10,11 +10,15 @@ using namespace std;
 
 class TextObserver : public Observer {
     weak_ptr<Game> g;
-    int playerNumber;
     ostream &out;
+    ostream &err;
+    int playerNumber;
     public:
-    TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber);
+    TextObserver(weak_ptr<Game> &g, ostream &out, ostream &err, int playerNumber);
     void notify() override;
+    void displayAbilities() override;
+    void displayError(const string &Err) override;
+    int getPlayerNumber() const override;
 };
 
 #endif

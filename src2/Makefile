@@ -8,7 +8,8 @@
 ########## Variables ##########
 
 CXX = g++-11				# compiler
-CXXFLAGS = -std=c++20 -g -Wall -Werror=vla -MMD		# compiler flags
+CXXFLAGS = -std=c++20 -g -Wall -Werror=vla -MMD	-I/opt/homebrew/include	# compiler flags
+LDFLAGS = -L/opt/homebrew/lib -lX11
 MAKEFILE_NAME = ${firstword ${MAKEFILE_LIST}}	# makefile name
 
 SOURCES = $(wildcard *.cc)			# source files (*.cc)
@@ -21,7 +22,7 @@ EXEC = Raiinet				# executable name
 .PHONY : clean					# not file names
 
 ${EXEC} : ${OBJECTS}				# link step
-	${CXX} ${CXXFLAGS} $^ -o $@ -lX11		# additional object files before $^
+	${CXX} ${CXXFLAGS} ${LDFLAGS} $^ -o $@		# additional object files before $^
 
 ${OBJECTS} : ${MAKEFILE_NAME}			# OPTIONAL : changes to this file => recompile
 

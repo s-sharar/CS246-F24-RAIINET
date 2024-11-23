@@ -10,7 +10,7 @@ Board::Board(int numRow) : size{numRow} {
     for (int i = 0; i < size; ++i) {
         grid[i].resize(size);
         for (int j = 0; j < numCol; ++j) {
-            Cell c{i, j};
+            Cell c{i, j, size};
             grid[i][j] = c;
         }
     }

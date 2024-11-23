@@ -17,6 +17,7 @@ class Game : public Subject {
     shared_ptr<Board> board;
     vector<shared_ptr<Player>> players;
     const int playerCount;
+    int activePlayers;
     int currentTurn = 1;
     bool gameOver = false;
     int playerWon = 0;
@@ -25,6 +26,7 @@ class Game : public Subject {
     Game(int playerCount, const vector<string> &linkOrders, const vector<string> &abilities, bool graphicsEnabled);
     void move(char link, const string &direction);
     void displayAbilities() const;
+    void displayErr(const string &err) const;
     string getAbilityName(int index);
     void useAbility(int abilityNumber, int row, int col);
     void useAbility(int abilityNumber, const string &abilityName, char link);
@@ -39,6 +41,7 @@ class Game : public Subject {
     bool isActive(int playeri) const;
     const shared_ptr<Player>& getPlayer(int playerNumber) const;
     shared_ptr<Board> getBoard() const;
+    int getCurrentTurn() const;
 };
 
 

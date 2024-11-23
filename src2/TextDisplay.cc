@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include "Ability.h"
 
 const int player1 = 1;
 const int player2 = 2;
@@ -12,15 +13,16 @@ const char p2Firewall = 'w';
 const char p1BaseChar = 'a';
 const char p2BaseChar = 'A';
 const char serverPort = 'S';
+const int abilitiesLen = 5;
 
 using namespace std;
 
-TextObserver::TextObserver(weak_ptr<Game> &g, ostream &out, int playerNumber) : g{g}, out{out}, playerNumber{playerNumber} {
-}
+TextObserver::TextObserver(weak_ptr<Game> &g, ostream &out, ostream &err, int playerNumber) : g{g}, out{out}, err{err}, playerNumber{playerNumber} {}
 
 void TextObserver::notify() {
     shared_ptr<Game> game;
     if (!(game = g.lock())) return;
+    out << "Player " << game->getCurrentTurn() << "'s turn" << endl;
     if (playerNumber == player1) {
         out << "Player " << playerNumber << ":" << endl;
         auto &player = game->getPlayer(playerNumber);
@@ -136,4 +138,26 @@ void TextObserver::notify() {
         }
         out << endl;
     }
+}
+
+
+void TextObserver::displayAbilities() {
+    string abilities = "";
+    auto game = g.lock();
+    auto player = game->getPlayer(playerNumber);
+    for (int i = 0; i < abilitiesLen - 1; ++i) {
+        auto ability = player->getAbility(i + 1);
+        abilities += to_string(ability->getAbilityID()) +  ": " + ability->getAbilityName() + "[" + (ability->getIsActivated() ? "Used]" : "Unused], ");
+    }
+    auto ability = player->getAbility(abilitiesLen);
+    abilities += to_string(ability->getAbilityID()) +  ": " + ability->getAbilityName() + "[" + (ability->getIsActivated() ? "Used]" : "Unused]");
+    out << abilities << endl;
+}
+
+int TextObserver::getPlayerNumber() const {
+    return playerNumber;
+}
+
+void TextObserver::displayError(const string &errMsg) {
+    err << errMsg << endl;
 }

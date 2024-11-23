@@ -6,6 +6,7 @@
 class Observer;
 
 class Subject {
+    protected:
     std::vector<std::shared_ptr<Observer>> observers;
     public:
     void attach(const std::shared_ptr<Observer> &o);
