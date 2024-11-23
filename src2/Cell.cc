@@ -112,3 +112,37 @@ bool Cell::isLocked() const {
 void Cell::setContent(char content) {
     c = content;
 }
+
+bool Cell::getTeleport() {
+    return teleportCell;
+}
+
+int Cell::getTeleportCol() {
+    return teleportCol;
+}
+
+int Cell::getTeleportRow() {
+    return teleportRow;
+}
+
+void Cell::setTeleportTarget(int row, int col) {
+    teleportCol = col;
+    teleportRow = row;
+}
+
+void Cell::setTeleport(bool what) {
+    teleportCell = what;
+}
+
+bool Cell::getImprisonCount() const {
+    return imprisonCount;
+}
+
+void Cell::decrementImprisonCount() {
+    --imprisonCount;
+    if (imprisonCount == 0) imprisonCell = false;
+}
+
+void Cell::setImprisonCount(int num) {
+    imprisonCount = num;
+}
