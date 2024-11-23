@@ -15,6 +15,7 @@ class Err {
     static string invalidAbility;
     static string invalidAbilityIndex;
     static string expectedCoordinatesForFireWall;
+    static string expectedCoordinatesforTeleport;
     static string expectedLinkIdentity;
     static string invalidCoordinates;
     static string invalidLinks;
@@ -34,10 +35,18 @@ class Err {
     static string cannotMoveDownloadedLink;
     static string notInBounds;
     static string cannotMoveOntoOwnLink;
+    static string cannotplaceTPonTP;
+    static string cannotplaceTPonFW;
+    static string cannotMoveOntoImprisonedSquare;
     static string cannotDownloadOwnLink(bool SP); // self server port and self side bound
     static string cannotUseAbilityOnOwnLink(const string &ability);
     static string cannotUseAbilityOnOtherLink(const string &ability);
     static string abilityAlreadyUsed(const string &name, int index);
+    static string Err::cannotPlaceAbilityonSP(const string &ability);
+    static string Err::cannotPlaceAbilityonFW(const string &ability);
+    static string Err::cannotPlaceAbilityonTP(const string &ability);
+    static string Err::cannotPlaceAbilityonIM(const string &ability);
+    static string Err::cannotPlaceAbilityDirectlyOnOpp(const string &ability);
     
 };
 

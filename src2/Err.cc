@@ -19,14 +19,17 @@ string Err::invalidAbilities = "Abilities can only be of the form [L] [F] [D] [S
 string Err::invalidAbility = "Abilities can only be of the form [L] [F] [D] [S] [P]";
 string Err::invalidAbilityIndex = "Expected an ability index from [1, 5]";
 string Err::expectedCoordinatesForFireWall = "Expected coordinates from firewall in the form <row> <col>";
+string Err::expectedCoordinatesforTeleport = "Expected coordinates for Teleport in the form of <row1> <col1> <row2> <col2>";
 string Err::expectedLinkIdentity = "Expected a specification for which link to use ability on";
 string Err::abilityUsedThisTurn = "You may only use one ability per turn. You must move a link before you use any more abilites.";
 string Err::isAlreadyBoosted = "This link has already been boosted!";
 string Err::isAlreadyDownloaded = "This link has already been downloaded!";
 string Err::isAlreadyVisible = "This link is already visible!";
-string Err::cannotPlaceFirewallOnSP = "You cannot place a firewall on a server port!";
-string Err::cannotPlaceFirewallOnFw = "You cannot place a firewall on another firewall!";
-string Err::cannotPlaceFirewallDirectlyOnOpp = "You cannot place a firewall directly on your opponent's link!";
+string Err::cannotPlaceAbilityonSP(const string &ability) {return "You cannot place " + ability + " on a server port!";}
+string Err::cannotPlaceAbilityonFW(const string &ability) {return "You cannot place " + ability + " on a firewall!";}
+string Err::cannotPlaceAbilityonTP(const string &ability) {return "You cannot place " + ability + " on a teleport!";}
+string Err::cannotPlaceAbilityonIM(const string &ability) {return "You cannot place " + ability + " on a imprison!";}
+string Err::cannotPlaceAbilityDirectlyOnOpp(const string &ability) {return "You cannot place " + ability + " directly on your opponent's link!";}
 
 // Coordinate Errors
 string Err::invalidCoordinates = "Invalid coordinates provided: outside the board";
@@ -40,6 +43,7 @@ string Err::cannotMoveOpponentsLink = "You cannot move your opponent's link!";
 string Err::cannotMoveDownloadedLink = "You cannot move a downloaded link!";
 string Err::notInBounds = "Cannot move out of bounds from edge not belonging to any player";
 string Err::cannotMoveOntoOwnLink = "Cannot move onto your own link";
+string Err::cannotMoveOntoImprisonedSquare = "Cannot move onto an imprisoned link";
 
 // Functions
 string Err::cannotDownloadOwnLink(bool SP) {
