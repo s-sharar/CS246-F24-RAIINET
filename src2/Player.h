@@ -11,13 +11,14 @@ class Ability;
 
 class Player {
     int id;
+    int size;
     vector<shared_ptr<Link>> links;
     vector<shared_ptr<Link>> downloadedLinks;
     vector<shared_ptr<Ability>> abilities;
     int numOfDataDownloaded, numOfVirusDownloaded, abilityCount;
     bool eliminated;
     public:
-    Player(const string &links,const string &abilities, int id);
+    Player(const string &links, int size, const string &abilities, int id);
     string getAbilityName(int i);
     void useAbility(int i);
     void download(shared_ptr<Link> &l);

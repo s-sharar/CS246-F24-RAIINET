@@ -29,11 +29,15 @@ class Game : public Subject {
     string getAbilityName(int index);
     void useAbility(int abilityNumber, int row, int col);
     void useAbility(int abilityNumber, const string &abilityName, char link);
+    void useAbility(int abilityNumber, int r1, int c1, int r2, int c2);
     void useFirewall(int row, int col);
     void useDownload(char link);
     void useLinkBoost(char link);
     void usePolarise(char link);
     void useScan(char link);
+    void useTeleport(int r1, int c1, int r2, int c2);
+    void useCorrupt(char link);
+    void useImprison(int row, int col);
     void battle(shared_ptr<Link> currLink, shared_ptr<Link> opponentLink, int opponentIndex, Cell &cell);
     void checkGameOver();
     bool validOutOfBounds(int row, int col) const;

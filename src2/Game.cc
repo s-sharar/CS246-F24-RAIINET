@@ -38,10 +38,10 @@ void getNewCords(int &row, int &col, shared_ptr<Link> &moveLink, const string &d
 
 
 Game::Game(int playerCount, const vector<string> &linkOrders, const vector<string> &abilities, bool graphicsEnabled) : playerCount{playerCount}, activePlayers{playerCount}, graphicsEnabled{graphicsEnabled} {
-    const int numRow = (playerCount == 2) ? 8 : 10;
-    board = make_shared<Board>(numRow);
+    int size = (playerCount == 2) ? 8 : 10;
+    board = make_shared<Board>(size);
     for (int i = 0; i < playerCount; ++i) {
-        players.emplace_back(make_shared<Player>(linkOrders[i], abilities[i], i + 1));
+        players.emplace_back(make_shared<Player>(linkOrders[i], size, abilities[i], i + 1));
     }
 }
 
@@ -83,6 +83,18 @@ void Game::useAbility(int abilityNumber, const string &abilityName, char link) {
     //notifyObservers();
 }
 
+void Game::useAbility(int abilityNumber, int r1, int c1, int r2, int c2) {
+    int playerIndex = currentTurn - 1;
+    const int numRow = (playerCount == 2) ? 8 : 10;
+    shared_ptr<Ability> ability = players[playerIndex]->getAbility(abilityNumber);
+    if (ability->getIsActivated()) throw runtime_error(Err::abilityAlreadyUsed(ability->getAbilityName(), ability->getAbilityID()));
+    if (!(r1 >= 0 && r1 < numRow && c1 >= 0 && c1 < numCol)) throw out_of_range(Err::invalidCoordinates);
+    if (!(r2 >= 0 && r2 < numRow && c2 >= 0 && c2 < numCol)) throw out_of_range(Err::invalidCoordinates);
+
+    useTeleport(r1, c1, r2, c2);
+    ability->useAbility();
+}
+
 void Game::move(char link, const string &direction) {
     // basic validations
     if (!validLink(link)) throw runtime_error(Err::invalidLink);
@@ -122,6 +134,8 @@ void Game::move(char link, const string &direction) {
     if (newCell.isOwnServerPort(currentTurn)) throw runtime_error(Err::cannotDownloadOwnLink(true));
     // self link
     if (validPiLink(newCell.getContent(), currentTurn)) throw runtime_error(Err::cannotMoveOntoOwnLink);
+    // imprisoned link on cell
+    if (newCell.imprisonCell() && newCell.getImprisonCount() > 0) throw runtime_error(Err::cannotMoveOntoImprisonedSquare);
 
     // Validations done
     
@@ -216,9 +230,26 @@ void Game::move(char link, const string &direction) {
             currLink->setCol(newCol);
         }
         // maybe additional logic
-    
-    // moving into an empty cell
-    } else {
+    }
+
+    // moving into cell with a teleport on it
+    else if (newCell.getTeleport()) {
+        int teleportToRow = newCell.getTeleportRow();
+        int teleportToCol = newCell.getTeleportCol();
+
+        Cell &teleportToCell = board->getCell(teleportToRow, teleportToCol);
+        teleportToCell.setContent(currLink->getId());
+        newCell.setTeleport(false);
+        teleportToCell.setTeleport(false);
+    }
+
+    // moving into cell with a imprison on it
+    else if (newCell.getImprisonCell()) {
+        newCell.setImprisonCount(3);
+    }
+
+    // else moving into an empty cell 
+    else {
         newCell.setContent(currLink->getId());
         currLink->setRow(newRow);
         currLink->setCol(newCol);
@@ -228,6 +259,13 @@ void Game::move(char link, const string &direction) {
     for (int i = 0; i < playerCount; ++i) {
         currentTurn = (currentTurn % playerCount) + 1;
         if (isActive(currentTurn)) break;
+    }
+
+    for (int i = 0; i < board->getSize(); ++i) {
+        for (int j = 0; j < board->getSize(); ++j) {
+            Cell &currCell = board->getCell(i,j);
+            if (currCell.getImprisonCount() != 0)  currCell.decrementImprisonCount();
+        }
     }
     checkGameOver();
     // notifyObservers();
@@ -320,6 +358,65 @@ void Game::useLinkBoost(char link) {
     if (currLink->getIsDownloaded()) throw runtime_error(Err::isAlreadyDownloaded);
     // this is executed if no errors thrown and updates ability state to being activated
     currLink->linkBoost();
+}
+
+void Game::useTeleport(int r1, int c1, int r2, int c2) {
+    // cannot place teleport on top of a link/firewall/trap/server port/ another teleport
+    // cannot place above half of the board
+    Cell &cell1 = board->getCell(r1, c1);
+    Cell &cell2 = board->getCell(r2, c2);
+    
+    // check if any of the cells already have teleport
+    if (cell1.getTeleport() || cell2.getTeleport()) {
+        throw runtime_error(Err::cannotPlaceAbilityonTP("Teleport"));
+    }
+    // check if any of the cells have a firewall
+    if (cell1.hasFirewall() || cell2.hasFirewall()) {
+        throw runtime_error(Err::cannotPlaceAbilityonFW("Teleport"));
+    }
+    // check if any of the cells are server ports
+    if (cell1.isServerPort() || cell2.isServerPort()) {
+        throw runtime_error(Err::cannotPlaceAbilityonSP("Teleport"));
+    }
+    // check if any of the cells contain a link
+    if (!(cell1.isEmpty() && cell2.isEmpty())) {
+        throw runtime_error(Err::cannotPlaceAbilityDirectlyOnOpp("Teleport"));
+    }
+    
+    // set cell1 teleport to cell2 cords
+    cell1.setTeleportTarget(cell2.getRow(), cell2.getCol());
+    // repeat for cell2
+    cell2.setTeleportTarget(cell1.getRow(), cell1.getCol());
+
+    cell1.setTeleport(true);
+    cell2.setTeleport(true);
+}
+
+void Game::useCorrupt(char link) {
+    
+}
+
+void Game::useImprison(int row, int col) {
+    Cell &cell = board->getCell(row, col);
+
+    // check if any of the cells already have teleport
+    if (cell.getTeleport()) {
+        throw runtime_error(Err::cannotPlaceAbilityonTP("Imprison"));
+    }
+    // check if any of the cells have a firewall
+    if (cell.hasFirewall()) {
+        throw runtime_error(Err::cannotPlaceAbilityonFW("Imprison"));
+    }
+    // check if any of the cells are server ports
+    if (cell.isServerPort()) {
+        throw runtime_error(Err::cannotPlaceAbilityonSP("Imprison"));
+    }
+    // check if any of the cells contain a link
+    if (!(cell.isEmpty())) {
+        throw runtime_error(Err::cannotPlaceAbilityDirectlyOnOpp("Imprison"));
+    }
+
+    cell.setImprisonCell(true);
 }
 
 void Game::checkGameOver() {

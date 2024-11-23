@@ -3,31 +3,39 @@
 #include <X11/Xlib.h>
 #include <iostream>
 #include <string>
+#include <map>
 
 class Xwindow {
-	Display *d;
-	Window w;
-	int s;
-	GC gc;
-	unsigned long colours[10];
+  Display *d;
+  Window w;
+  int s, width, height;
+  GC gc;
+  unsigned long colours[5];
+  std::map<std::string, Font> fonts;
+  std::map<std::string, GC> fontGCs;
 
-public:
-	Xwindow(int width=580, int height=880);  // Constructor; displays the window.
-	~Xwindow();                              // Destructor; destroys the window.
-	Xwindow(const Xwindow&) = delete;
-	Xwindow &operator=(const Xwindow&) = delete;
+ public:
+  Xwindow(int width=500, int height=500);  // Constructor; displays the window.
+  ~Xwindow();                              // Destructor; destroys the window.
 
-	enum {White=0, Black, Red, Green, Blue, Yellow, Pink, Orange}; // Available colours.
+  enum {White=0, Black, Red, Green, Blue}; // Available colours.
 
-	// Draws a rectangle
-	void fillRectangle(int x, int y, int width, int height, int colour=Black);
+  int getWidth() const;
+  int getHeight() const;
 
-	// Draws a string
-	void drawString(int x, int y,  std::string msg);
+  // Draws a rectangle
+  void fillRectangle(int x, int y, int width, int height, int colour=Black);
 
-	// Draws a Circle
-	void fillCircle (int x, int y, int r, int colour);
-	void drawCircle (int x, int y, int r, int colour);
+    void drawRectangle(int x, int y, int width, int height, int colour=Black);
+
+    // Draws a string using default font
+    void drawString(int x, int y, std::string msg, int colour=Black);
+
+    // Draws a string using specified font
+    void drawStringFont(int x, int y, std::string msg, std::string fontName, int colour=Black);
+
+    // Loads a font
+    void loadFont(std::string fontName);
 };
 
 #endif

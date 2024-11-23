@@ -13,25 +13,59 @@ const int p1BaseRow = 0;
 const int p2BaseRow = 7;
 const int maxAbilityCount = 5;
 
-Player::Player(const string &linksString, const string &abilitiesString, int id) : id{id}, numOfDataDownloaded{0}, numOfVirusDownloaded{0}, abilityCount{static_cast<int>(abilitiesString.length())} {
+Player::Player(const string &linksString, int size, const string &abilitiesString, int id) : id{id}, size{size}, numOfDataDownloaded{0}, numOfVirusDownloaded{0}, abilityCount{static_cast<int>(abilitiesString.length())} {
     // Assume links and abilities passed are valid since they are checked in main.
-    char baseChar = (id == 1) ? 'a' : 'A';
-    int row = (id == 1) ? p1BaseRow : p2BaseRow;
-    int col = 0;
+    int shift  = (size == 8) ? 0 : 1;
+    char baseChar;
+    int row;
+    int col;
+    int *primaryDirection;
+    switch id {
+        case 1: 
+            baseChar = 'a';
+            row = 0;
+            col = shift; 
+            primaryDirection = &col;
+        case 2: 
+            baseChar = 'A';
+            row = size - 1;
+            col = shift;
+            primaryDirection = &col;
+        case 3: 
+            baseChar = 'i';
+            row = shift;
+            col = 0;
+            primaryDirection = &row;
+        case 4: 
+            baseChar = 'I';
+            row = shift;
+            col = size - 1;
+            primaryDirection = &row;
+    }
+    
     for (size_t i = 0; i < linksString.length(); i += individualLinkLength) {
         bool isServerPort = i >= serverPortStart && i < serverPortEnd;
         LinkType linkType = linksString[i] == 'D' ? LinkType::Data : LinkType::Virus;
         int strength = linksString[i + 1] - '0';
-        char linkID = static_cast<char>(baseChar + col);
+        char linkID = static_cast<char>(baseChar + (i / individualLinkLength));
         int linkRow = row;
-        if (isServerPort && id == 1) {
-            ++linkRow;
-        } else if (isServerPort) {
-            --linkRow;
+        int linkCol = col;
+        if (isServerPort) {
+            switch id {
+                case 1: 
+                    ++linkRow;
+                case 2: 
+                    --linkRow;
+                case 3: 
+                    ++linkCol;
+                case 4: 
+                    --linkCol;
+            }
         }
-        links.emplace_back(make_shared<Link>(linkID, linkType, strength, linkRow, col));
-        ++col;
+        links.emplace_back(make_shared<Link>(linkID, linkType, strength, linkRow, linkCol));
+        ++(*primaryDirection);
     }
+
     for (int i = 0; i < maxAbilityCount; ++i) {
         abilities.emplace_back(make_shared<Ability>(abilitiesString[i], i + 1));
     }

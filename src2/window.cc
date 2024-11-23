@@ -1,94 +1,114 @@
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <iostream>
-#include <cstdlib>
-#include <string>
-#include <unistd.h>
 #include "window.h"
+#include <X11/Xutil.h>
+#include <cstdlib>
 
-using namespace std;
 
-Xwindow::Xwindow(int width, int height) {
-	d = XOpenDisplay(NULL);
-	if (d == NULL) {
-		cerr << "Cannot open display" << endl;
-		exit(1);
-	}
-	
-	s = DefaultScreen(d);
-	w = XCreateSimpleWindow(
-		d, RootWindow(d, s), 10, 10, width, height, 
-		1, BlackPixel(d, s), WhitePixel(d, s)
-	);
 
-	XSelectInput(d, w, ExposureMask | KeyPressMask);
+Xwindow::Xwindow(int width, int height) : width(width), height(height) {
+    d = XOpenDisplay(NULL);
+    if (d == NULL) {
+        std::cerr << "Cannot open display" << std::endl;
+        exit(1);
+    }
+    s = DefaultScreen(d);
+    w = XCreateSimpleWindow(d, RootWindow(d, s), 10, 10, width, height, 1,
+                            BlackPixel(d, s), WhitePixel(d, s));
+    XSelectInput(d, w, ExposureMask | KeyPressMask);
+    XMapRaised(d, w);
 
-	Pixmap pix = XCreatePixmap(
-		d, w, width, height, 
-		DefaultDepth(d, DefaultScreen(d))
-	);
+    gc = XCreateGC(d, w, 0, (XGCValues *)0);
 
-	gc = XCreateGC(d, pix, 0, 0);
+    XFlush(d);
+    XFlush(d);
 
-	// Set up colours.
-	XColor xcolour;
-	Colormap cmap;
+    // Set up colours.
+    XColor xcolour;
+    Colormap cmap;
+    char color_vals[10][20] = {"white", "black", "red", "green", "blue",
+                               "cyan", "yellow", "magenta", "orange", "brown"};
 
-	const size_t numColours = 8;
-	char color_vals[numColours][10] = {
-		"white", "black", "red", 
-		"green", "blue", "yellow", "pink", "orange"
-	};
+    cmap = DefaultColormap(d, DefaultScreen(d));
+    for(int i = 0; i < 10; ++i) {
+        if(!XParseColor(d, cmap, color_vals[i], &xcolour)) {
+            std::cerr << "Bad colour: " << color_vals[i] << std::endl;
+        }
+        if(!XAllocColor(d, cmap, &xcolour)) {
+            std::cerr << "Bad colour: " << color_vals[i] << std::endl;
+        }
+        colours[i] = xcolour.pixel;
+    }
 
-	cmap = DefaultColormap(d, DefaultScreen(d));
-	
-	for(unsigned int i = 0; i < numColours; ++i) {
-		XParseColor(d, cmap, color_vals[i], &xcolour);
-		XAllocColor(d, cmap, &xcolour);
-		colours[i] = xcolour.pixel;
-	}
+    XSetForeground(d, gc, colours[Black]);
 
-	XSetForeground(d, gc, colours[Black]);
+    // Make window non-resizable.
+    XSizeHints hints;
+    hints.flags = (USPosition | PSize | PMinSize | PMaxSize );
+    hints.height = hints.base_height = hints.min_height = hints.max_height = height;
+    hints.width = hints.base_width = hints.min_width = hints.max_width = width;
+    XSetNormalHints(d, w, &hints);
 
-	 // Make window non-resizeable.
-	XSizeHints hints;
-	hints.flags = (USPosition | PSize | PMinSize | PMaxSize );
-	hints.height = hints.base_height = hints.min_height = hints.max_height = height;
-	hints.width = hints.base_width = hints.min_width = hints.max_width = width;
-	XSetNormalHints(d, w, &hints);
+    XSynchronize(d, True);
 
-	// map window and flush
-	XMapRaised(d, w);
-	XFlush(d);
-	
-	// wait 1 second for setup
-	sleep(1);
+    usleep(1000);
 }
 
 Xwindow::~Xwindow() {
-	XFreeGC(d, gc);
-	XCloseDisplay(d);
+    // Free loaded fonts and GCs
+    for(auto &pair : fontGCs) {
+        XFreeGC(d, pair.second);
+    }
+    // Close the display
+    XFreeGC(d, gc);
+    XCloseDisplay(d);
 }
 
 void Xwindow::fillRectangle(int x, int y, int width, int height, int colour) {
-	XSetForeground(d, gc, colours[colour]);
-	XFillRectangle(d, w, gc, x, y, width, height);
-	XFlush(d);
+    XSetForeground(d, gc, colours[colour]);
+    XFillRectangle(d, w, gc, x, y, width, height);
+    XSetForeground(d, gc, colours[Black]);
 }
 
-void Xwindow::drawString(int x, int y,  string msg) {
-	XDrawString(d, w, DefaultGC(d, s), x, y, msg.c_str(), msg.length());
-	XFlush(d);
+void Xwindow::drawRectangle(int x, int y, int width, int height, int colour) {
+    XSetForeground(d, gc, colours[colour]);
+    XDrawRectangle(d, w, gc, x, y, width, height);
+    XSetForeground(d, gc, colours[Black]);
 }
 
-void Xwindow::fillCircle (int x, int y, int r, int colour) {
-	XSetForeground(d, gc, colours[colour]);
-	XFillArc(d, w, gc, x, y, r, r, 0, 360*64);
-	XFlush(d);
+void Xwindow::drawString(int x, int y, std::string msg, int colour) {
+    XSetForeground(d, gc, colours[colour]);
+    XDrawString(d, w, gc, x, y, msg.c_str(), msg.length());
+    XSetForeground(d, gc, colours[Black]);
 }
 
-void Xwindow::drawCircle (int x, int y, int r, int colour) {
-	XSetForeground(d, gc, colours[colour]);
-	XDrawArc(d, w, gc, x, y, r, r, 0, 360*64);
-	XFlush(d);
+void Xwindow::loadFont(std::string fontName) {
+    if(fonts.find(fontName) == fonts.end()) {
+        XFontStruct *font_info = XLoadQueryFont(d, fontName.c_str());
+        if(!font_info) {
+            std::cerr << "Error loading font: " << fontName << std::endl;
+            return;
+        }
+        fonts[fontName] = font_info->fid;
+
+        XGCValues values;
+        values.font = font_info->fid;
+        values.foreground = BlackPixel(d, s);
+        GC fontGC = XCreateGC(d, w, GCFont | GCForeground, &values);
+        fontGCs[fontName] = fontGC;
+
+        XFreeFont(d, font_info);
+    }
+}
+
+void Xwindow::drawStringFont(int x, int y, std::string msg, std::string fontName, int colour) {
+    if(fontGCs.find(fontName) == fontGCs.end()) {
+        loadFont(fontName);
+    }
+    if(fontGCs.find(fontName) != fontGCs.end()) {
+        GC fontGC = fontGCs[fontName];
+        XSetForeground(d, fontGC, colours[colour]);
+        XDrawString(d, w, fontGC, x, y, msg.c_str(), msg.length());
+        XSetForeground(d, fontGC, colours[Black]);
+    } else {
+        drawString(x, y, msg, colour);
+    }
 }
