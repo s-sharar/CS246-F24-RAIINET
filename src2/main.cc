@@ -25,7 +25,7 @@ string retrieveLink(ifstream &file);
 
 int main(int argc, const char* argv[]){
     // Argument checking here
-    string validAbilities = "LFDSP";
+    string validAbilities = "LFDSPT";
     vector<string> playerAbilities(numPlayers, "LFDSP"); // index + 1 represents player number
     vector<string> playerLinkOrders(numPlayers); // same here
     for (int i = 0; i < numPlayers; ++i) {
@@ -105,10 +105,14 @@ int main(int argc, const char* argv[]){
                 int abilityIndex = 0;
                 if (!(*in >> abilityIndex)) throw runtime_error(Err::invalidAbilityIndex);
                 string abilityName = game->getAbilityName(abilityIndex);
-                if (abilityName == "Firewall") {
+                if (abilityName == "Firewall" || abilityName == "Imprison") {
                     int row, col;
                     if (!(*in >> row >> col)) throw runtime_error(Err::expectedCoordinatesForFireWall);
                     game->useAbility(abilityIndex, row, col);
+                } else if (abilityName == "Teleport") {
+                    int r1, c1, r2, c2;
+                    if (!(*in >> r1 >> c1 >> r2 >> c2)) throw runtime_error(Err::expectedCoordinatesforTeleport);
+                    game->useAbility(abilityIndex, r1, c1, r2, c2);
                 } else {
                     char c;
                     if (!(*in >> c)) throw runtime_error(Err::expectedLinkIdentity);
