@@ -20,7 +20,8 @@ Player::Player(const string &linksString, int size, const string &abilitiesStrin
     int row;
     int col;
     int *primaryDirection;
-    switch id {
+    cout << id << endl;
+    switch (id) {
         case 1: 
             baseChar = 'a';
             row = 0;
@@ -51,7 +52,7 @@ Player::Player(const string &linksString, int size, const string &abilitiesStrin
         int linkRow = row;
         int linkCol = col;
         if (isServerPort) {
-            switch id {
+            switch (id) {
                 case 1: 
                     ++linkRow;
                 case 2: 
@@ -97,6 +98,14 @@ int Player::getVirusDownloaded() const {
     return numOfVirusDownloaded;
 }
 
+void Player::setDataDownloaded(int i) {
+    numOfDataDownloaded = i;
+}
+
+void Player::setVirusDownloaded(int i) {
+    numOfVirusDownloaded = i;
+}
+
 bool Player::getEliminated() const {
     return eliminated;
 }
@@ -117,5 +126,9 @@ shared_ptr<Ability> Player::getAbility(int abilityNumber) {
 shared_ptr<Link> Player::getLink(char c, int playerNumber) {
     char base = playerNumber == 1 ? 'a' : 'A';
     int index = static_cast<int> (c - base);
+
+    cout << "in player.cc: " << index << endl;
+    cout << links[index]->getId() << endl;
+    
     return links[index];
 }

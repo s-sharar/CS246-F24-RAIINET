@@ -26,8 +26,8 @@ Ability::Ability(char code, int id) : id{id}, isActivated{false} {
             case 'I':   
                 ability = Abilities::Imprison;
                 break;
-            case 'U':   
-                ability = Abilities::Undecided;
+            case 'R':   
+                ability = Abilities::Restore;
                 break;
             default: throw(Err::invalidAbility + ", hence " + std::to_string(code) + " is invalid.");
         }
@@ -42,14 +42,14 @@ int Ability::getAbilityID() {
 std::string Ability::getAbilityName(){
     switch (ability)
     {
-        case Abilities::LinkBoost:   return "LinkBoost";
-        case Abilities::Firewall:   return "Firewall";
-        case Abilities::Download: return "Download";
-        case Abilities::Polarize:   return "Polarize";
-        case Abilities::Scan:       return "Scan";
-        case Abilities::Teleport:   return "Teleport";
-        case Abilities::Imprison: return "Imprison";
-        case Abilities::Undecided: return "Undecided";
+        case Abilities::LinkBoost: return "LinkBoost";
+        case Abilities::Firewall:  return "Firewall";
+        case Abilities::Download:  return "Download";
+        case Abilities::Polarize:  return "Polarize";
+        case Abilities::Scan:      return "Scan";
+        case Abilities::Teleport:  return "Teleport";
+        case Abilities::Imprison:  return "Imprison";
+        case Abilities::Restore:   return "Restore";
     }
     return "";
     

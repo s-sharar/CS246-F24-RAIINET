@@ -24,6 +24,8 @@ class Player {
     void download(shared_ptr<Link> &l);
     int getDataDownloaded() const;
     int getVirusDownloaded() const;
+    void setDataDownloaded(int i);
+    void setVirusDownloaded(int i);
     int getRemainingAbilities() const;
     bool getEliminated() const;
     void setEliminated(bool b);

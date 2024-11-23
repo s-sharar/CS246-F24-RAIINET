@@ -36,7 +36,7 @@ class Game : public Subject {
     void usePolarise(char link);
     void useScan(char link);
     void useTeleport(int r1, int c1, int r2, int c2);
-    void useCorrupt(char link);
+    void useRestore(char link);
     void useImprison(int row, int col);
     void battle(shared_ptr<Link> currLink, shared_ptr<Link> opponentLink, int opponentIndex, Cell &cell);
     void checkGameOver();

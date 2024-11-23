@@ -42,11 +42,11 @@ class Err {
     static string cannotUseAbilityOnOwnLink(const string &ability);
     static string cannotUseAbilityOnOtherLink(const string &ability);
     static string abilityAlreadyUsed(const string &name, int index);
-    static string Err::cannotPlaceAbilityonSP(const string &ability);
-    static string Err::cannotPlaceAbilityonFW(const string &ability);
-    static string Err::cannotPlaceAbilityonTP(const string &ability);
-    static string Err::cannotPlaceAbilityonIM(const string &ability);
-    static string Err::cannotPlaceAbilityDirectlyOnOpp(const string &ability);
+    static string cannotPlaceAbilityonSP(const string &ability);
+    static string cannotPlaceAbilityonFW(const string &ability);
+    static string cannotPlaceAbilityonTP(const string &ability);
+    static string cannotPlaceAbilityonIM(const string &ability);
+    static string cannotPlaceAbilityDirectlyOnOpp(const string &ability);
     
 };
 

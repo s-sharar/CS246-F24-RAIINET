@@ -25,7 +25,7 @@ string retrieveLink(ifstream &file);
 
 int main(int argc, const char* argv[]){
     // Argument checking here
-    string validAbilities = "LFDSPT";
+    string validAbilities = "LFDSPTR";
     vector<string> playerAbilities(numPlayers, "LFDSP"); // index + 1 represents player number
     vector<string> playerLinkOrders(numPlayers); // same here
     for (int i = 0; i < numPlayers; ++i) {

@@ -73,4 +73,19 @@ void Link::download() {
     isDownloaded = true;
     isVisible = true;
 }
+
+void Link::undownload() {
+    if (!isDownloaded) {
+        // throw runtime error (only can be used for downloaded links)
+    }
+    isDownloaded = false;
+}
+
+void Link::setDownloadedBy(int i) {
+    downloadedBy = i;
+}
+
+int Link::getDownloadedBy() const {
+    return downloadedBy;
+}
     

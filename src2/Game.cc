@@ -3,6 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <compare>
+#include <random>
 #include "Err.h"
 #include "Ability.h"
 
@@ -77,6 +78,8 @@ void Game::useAbility(int abilityNumber, const string &abilityName, char link) {
         usePolarise(link);
     } else if (abilityName == "Scan") {
         useScan(link);
+    } else if (abilityName == "Restore") {
+        useRestore(link);
     }
     ability->useAbility();
     checkGameOver();
@@ -100,8 +103,10 @@ void Game::move(char link, const string &direction) {
     if (!validLink(link)) throw runtime_error(Err::invalidLink);
     if (!validDirection(direction)) throw runtime_error(Err::invalidDirection);
     if (!validPiLink(link, currentTurn)) throw runtime_error(Err::cannotMoveOpponentsLink);
+    cout << link << endl;
 
     int playerIndex = currentTurn - 1;
+    cout << "player index: " << playerIndex << endl;
 
     shared_ptr<Link> currLink = players[playerIndex]->getLink(link, currentTurn);
     
@@ -112,7 +117,10 @@ void Game::move(char link, const string &direction) {
     // get cords of cell we're moving to
     int newRow = 0, newCol = 0;
     getNewCords(newRow, newCol, currLink, direction);
-    
+
+    cout << newRow << ',' << newCol << endl;
+    cout << currLink->getId() << endl;
+
     // check in bounds
     Cell &oldCell = board->getCell(currLink->getRow(), currLink->getCol());
     // valid iff player moves off opponents edge of the board
@@ -135,7 +143,7 @@ void Game::move(char link, const string &direction) {
     // self link
     if (validPiLink(newCell.getContent(), currentTurn)) throw runtime_error(Err::cannotMoveOntoOwnLink);
     // imprisoned link on cell
-    if (newCell.imprisonCell() && newCell.getImprisonCount() > 0) throw runtime_error(Err::cannotMoveOntoImprisonedSquare);
+    // if (newCell.imprisonCell() && newCell.getImprisonCount() > 0) throw runtime_error(Err::cannotMoveOntoImprisonedSquare);
 
     // Validations done
     
@@ -147,6 +155,7 @@ void Game::move(char link, const string &direction) {
         int opponentIndex = newCell.getPlayersServerPort() - 1;
         if (!(players[opponentIndex]->getEliminated())) { // only download if player not eliminated
             currLink->download();
+            currLink->setDownloadedBy(opponentIndex + 1);
             players[opponentIndex]->download(currLink);
         } else { // moving onto serverport of eliminated player
             newCell.setContent(currLink->getId());
@@ -186,6 +195,7 @@ void Game::move(char link, const string &direction) {
             if (currLink->getType() == LinkType::Virus) {
                 players[playerIndex]->download(currLink);
                 currLink->download();
+                currLink->setDownloadedBy(currentTurn);
             } else {
                 currLink->setIsVisible(true);
                 if (newCell.isEmpty()) {
@@ -241,12 +251,14 @@ void Game::move(char link, const string &direction) {
         teleportToCell.setContent(currLink->getId());
         newCell.setTeleport(false);
         teleportToCell.setTeleport(false);
+        currLink->setRow(teleportToRow);
+        currLink->setCol(teleportToCol);
     }
 
     // moving into cell with a imprison on it
-    else if (newCell.getImprisonCell()) {
-        newCell.setImprisonCount(3);
-    }
+    // else if (newCell.getImprisonCell()) {
+    //     newCell.setImprisonCount(3);
+    // }
 
     // else moving into an empty cell 
     else {
@@ -274,18 +286,152 @@ void Game::move(char link, const string &direction) {
 void Game::useFirewall(int row, int col) {
     Cell &cell = board->getCell(row, col);
     // check if trying to place Firewall on a server port
-    if (cell.isServerPort()) throw runtime_error(Err::cannotPlaceFirewallOnSP);
+    if (cell.isServerPort()) throw runtime_error(Err::cannotPlaceAbilityonSP("Firewall"));
     // check if trying to place firewall on a firewall
-    if (cell.hasFirewall()) throw runtime_error(Err::cannotPlaceFirewallOnFw);
+    if (cell.hasFirewall()) throw runtime_error(Err::cannotPlaceAbilityonFW("Firewall"));
     // TODO: check for teleport, trap
     // assuming we cannot place a firewall directly onto our opponents links
     for (int i = 0; i < playerCount; ++i) {
         if (i + 1 != currentTurn) {
-            if (validPiLink(cell.getContent(), i + 1)) throw runtime_error(Err::cannotPlaceFirewallDirectlyOnOpp);
+            if (validPiLink(cell.getContent(), i + 1)) throw runtime_error(Err::cannotPlaceAbilityDirectlyOnOpp("Firewall"));
         }
     } 
     
     cell.setFirewall(currentTurn, true);
+}
+
+void Game::useRestore(char link) {
+    // this is the person who owns the downloaded link
+    int linkOnwerIndex;
+    for (int i = 0; i < playerCount; ++i) {
+        if (validPiLink(link, i+i)) linkOnwerIndex = i;
+    }
+
+    shared_ptr<Link> currLink = players[linkOnwerIndex]->getLink(link, linkOnwerIndex + 1);
+
+    // this ability can only be used on a downloaded link
+    if (!currLink->getIsDownloaded()) {
+        // throw runtime error (can only be used with downloaded links)
+    }
+
+    // this is the person that downloaded the link
+    int restoredLinkPlayerIndex = currLink->getDownloadedBy() - 1;
+
+    // decrement the counts
+    // Restored link is either a data or a virus
+    if (currLink->getType() == LinkType::Virus) {
+        int virusDownloaded = players[restoredLinkPlayerIndex]->getVirusDownloaded();
+        players[restoredLinkPlayerIndex]->setVirusDownloaded(virusDownloaded - 1);
+    }
+    else {
+        int dataDownloaded = players[restoredLinkPlayerIndex]->getDataDownloaded();
+        players[restoredLinkPlayerIndex]->setVirusDownloaded(dataDownloaded - 1);
+    }
+    // reset status of link
+    currLink->undownload();
+
+    // find new cords randomly
+    const int numRow = (playerCount == 2) ? 8 : 10;
+    int restoredRow;
+    int restoredCol;
+    bool foundValidCords = false;
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> randomCol(0, numCol);
+    uniform_int_distribution<> randomRow(0, numRow);
+
+    while (!foundValidCords) {
+        // gets a random number between 0 and numCol/numRow
+        restoredRow = randomRow(gen);
+        restoredCol = randomCol(gen);
+
+        // it only cannot be a cell containing the link owner's links and cannot be locked as well
+        Cell &cell = board->getCell(restoredRow, restoredCol);
+        if (!(cell.isLocked() || validPiLink(cell.getContent(), linkOnwerIndex + 1))) {
+            foundValidCords = true;
+        }
+    }
+
+    Cell &restoredCell = board->getCell(restoredRow, restoredCol);
+    // now assume new cords is a valid cell that doesn't contain linkOwner's links
+
+    // TODO: clean this up, it's so hard to read
+
+    // new cords is a firewall
+    if (restoredCell.hasFirewall()) {
+        // either linkOwner's or opp's firewall
+        if (restoredCell.hasOpponnentFirewall(linkOnwerIndex + 1)) {
+            if (currLink->getType() == LinkType::Virus) {
+                currLink->download();
+                players[linkOnwerIndex]->download(currLink);
+            }
+            // currLink is a data
+            else {
+                if (restoredCell.isEmpty()) {
+                    restoredCell.setContent(currLink->getId());
+                    currLink->setRow(restoredRow);
+                    currLink->setCol(restoredCol);
+                }
+                // if not empty then battle
+                else {
+                    char content = restoredCell.getContent();
+                    int opponentIndex;
+                    for (int i = 0; i < playerCount; ++i) {
+                        if (validPiLink(content, i + 1)) opponentIndex = i;
+                    }
+                    shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
+                    battle(currLink, opponentLink, opponentIndex, restoredCell);
+                }
+            }
+        }
+        else if (restoredCell.isEmpty()) {
+                restoredCell.setContent(currLink->getId());
+                currLink->setRow(restoredRow);
+                currLink->setCol(restoredCol);
+            }
+        // else battle
+        else {
+            char content = restoredCell.getContent();
+            int opponentIndex;
+            for (int i = 0; i < playerCount; ++i) {
+                if (validPiLink(content, i + 1)) opponentIndex = i;
+            }
+            shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
+            battle(currLink, opponentLink, opponentIndex, restoredCell);
+        }
+    }
+    // if new cords contain a teleport
+    else if (restoredCell.getTeleport()) {
+        int teleportRow = restoredCell.getTeleportRow();
+        int teleportCol = restoredCell.getTeleportCol();
+        board->getCell(teleportRow, teleportCol).setContent(currLink->getId());
+        currLink->setCol(teleportCol);
+        currLink->setRow(teleportRow);
+    }
+    else if (restoredCell.isServerPort()) {
+        int playerPort = restoredCell.getPlayersServerPort();
+        currLink->download();
+        players[playerPort - 1]->download(currLink);
+    }
+    else if (false) {
+        // TODO: if cell has an unactivated trap. If trap is activated with a link in it, then it will just battle
+    }
+    // if new cord contains opp link
+    else if (!restoredCell.isEmpty()) {
+        char content = restoredCell.getContent();
+        int opponentIndex;
+        for (int i = 0; i < playerCount; ++i) {
+            if (validPiLink(content, i + 1)) opponentIndex = i;
+        }
+        shared_ptr<Link> opponentLink = players[opponentIndex]->getLink(content, opponentIndex + 1);
+        battle(currLink, opponentLink, opponentIndex, restoredCell);
+    }
+    // else it is empty
+    else {
+        restoredCell.setContent(currLink->getId());
+        currLink->setCol(restoredCell.getCol());
+        currLink->setRow(restoredCell.getRow());
+    }
 }
 
 
@@ -326,6 +472,7 @@ void Game::useDownload(char link) {
 
     // line directly below checks if already downloaded, if so throws error
     downloadedLink->download();
+    downloadedLink->setDownloadedBy(currentTurn);
     players[playerIndex]->download(downloadedLink);
     int row = downloadedLink->getRow(), col = downloadedLink->getCol();
     Cell &cell = board->getCell(row, col);
@@ -392,10 +539,6 @@ void Game::useTeleport(int r1, int c1, int r2, int c2) {
     cell2.setTeleport(true);
 }
 
-void Game::useCorrupt(char link) {
-    
-}
-
 void Game::useImprison(int row, int col) {
     Cell &cell = board->getCell(row, col);
 
@@ -416,7 +559,7 @@ void Game::useImprison(int row, int col) {
         throw runtime_error(Err::cannotPlaceAbilityDirectlyOnOpp("Imprison"));
     }
 
-    cell.setImprisonCell(true);
+    // cell.setImprisonCell(true);
 }
 
 void Game::checkGameOver() {
@@ -459,13 +602,18 @@ void Game::battle(shared_ptr<Link> currLink, shared_ptr<Link> oppLink, int oppon
     oppLink->setIsVisible(true);
     int currStrength = currLink->getStrength();
     int oppStrength = oppLink->getStrength();
-    int playerIndex = currentTurn - 1;
+    int playerIndex;
+    char link = currLink->getId();
+    for (int i = 0; i < playerCount; i++) {
+        if (validPiLink(link, i+i)) playerIndex = i;
+    }
     bool currLinkWon = currStrength >= oppStrength;
     
     if (currLinkWon) {
         // player downloads and also link status gets updated
         players[playerIndex]->download(oppLink);
         oppLink->download();
+        oppLink->setDownloadedBy(playerIndex + 1);
 
         // set the cell with currLink contents
         currLink->setCol(cell.getCol());
@@ -476,6 +624,7 @@ void Game::battle(shared_ptr<Link> currLink, shared_ptr<Link> oppLink, int oppon
         // otherwise opponent simply downloads currLink and link status is updated
         players[opponentIndex]->download(currLink);
         currLink->download();
+        currLink->setDownloadedBy(opponentIndex + 1);
     }
 }
 
