@@ -1,5 +1,5 @@
 # Raiinet
-#### RAIInet is a strategy-based networking game where players compete to dominate a grid-based digital arena by capturing server ports and outmaneuvering opponents. Players control "links" (game pieces) and use unique abilities to manipulate the board, defend their network, and disrupt their opponents. The game supports both 2-player and 4-player modes, and offers immersive gameplay through both text-based and graphical displays. 
+#### RAIInet is a strategy-based networking game where players compete to dominate a grid-based digital arena by capturing server ports and outmaneuvering opponents. Players control "links" (game pieces) and use unique abilities to manipulate the board, defend their network, and disrupt their opponents. The game supports both 2-player and 4-player modes, and offers immersive gameplay through both text-based and graphical displays. We earned the maximum possbile grade of a 110%.
   <h3>Features:</h3>
     <ul>
         <li><strong>MVC architecture:</strong> The Game class controls the game state, the Observers manage output while the Controller manages control flow and user input.</li>
