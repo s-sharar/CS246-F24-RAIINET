@@ -1,5 +1,5 @@
 # Raiinet
-## A strategy-based board game built in C++ featuring 2 and 4-player modes.
+### RAIInet is a strategy-based networking game where players compete to dominate a grid-based digital arena by capturing server ports and outmaneuvering opponents. Players control "links" (game pieces) and use unique abilities to manipulate the board, defend their network, and disrupt their opponents. The game supports both 2-player and 4-player modes, and offers immersive gameplay through both text-based and graphical displays. 
   <h3>Features:</h3>
     <ul>
         <li><strong>MVC architecture:</strong> The Game class controls the game state, the Observers manage output while the Controller manages control flow and user input.</li>
@@ -9,3 +9,15 @@
         <li><strong>Smart Pointers:</strong> Used throughout for robust memory management (no explicit deletion).</li>
         <li><strong>Extra Abilities:</strong> Added 5 new abilities, extending the core gameplay mechanics.</li>
     </ul>
+<div style="display: flex; justify-content: space-between; border: 5px solid white; padding: 10px 20px;">
+  <div style ="flex: 1; margin-right: 10px;">
+    <h3 style="text-align: center;"> 2-Player display: </h3>
+    <div style="border: 2px solid white; margin: 20px 0px;"> </div>
+    <img src="./assets/2Pdisplay.png" />
+  </div>
+  <div style ="flex: 1;">
+    <h3 style="text-align: center;"> 4-Player display: </h3>
+      <div style="border: 2px solid white;margin: 20px 0px;"> </div>
+    <img src="./assets/4Pdisplay.png" />
+  </div>
+<div/>
