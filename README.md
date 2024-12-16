@@ -13,11 +13,11 @@
   <div style ="flex: 1; margin-right: 10px;">
     <h3 style="text-align: center;"> 2-Player display: </h3>
     <div style="border: 2px solid white; margin: 20px 0px;"> </div>
-    <img src="./assets/2Pdisplay.png" />
+    <img src="./assets/2Pdisplay.png" style="width: 100%; max-width: 100%;"/>
   </div>
   <div style ="flex: 1;">
     <h3 style="text-align: center;"> 4-Player display: </h3>
       <div style="border: 2px solid white;margin: 20px 0px;"> </div>
-    <img src="./assets/4Pdisplay.png" />
+    <img src="./assets/4Pdisplay.png" style="width: 100%; max-width: 100%;"/>
   </div>
 <div/>
