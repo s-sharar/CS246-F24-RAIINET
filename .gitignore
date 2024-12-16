@@ -1,0 +1,8 @@
+*.o
+*.d
+raiinet
+project_guidelines.pdf
+RAIInet.pdf
+*.txt
+*.in
+test
