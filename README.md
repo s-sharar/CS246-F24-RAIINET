@@ -1,5 +1,5 @@
 # Raiinet
-## A strategy-based board game built in C++ featuring 2-player and 4-player modes.
+## A strategy-based board game built in C++ featuring 2 and 4-player modes.
   <h3>Features:</h3>
     <ul>
         <li><strong>MVC architecture:</strong> The Game class controls the game state, the Observers manage output while the Controller manages control flow and user input.</li>
