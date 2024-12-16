@@ -9,15 +9,17 @@
         <li><strong>Smart Pointers:</strong> Used throughout for robust memory management (no explicit deletion).</li>
         <li><strong>Extra Abilities:</strong> Added 5 new abilities, extending the core gameplay mechanics.</li>
     </ul>
-<div style="display: flex; justify-content: space-between; border: 5px solid white; padding: 10px 20px;">
-  <div style ="flex: 1; margin-right: 10px;">
-    <h3 style="text-align: center;"> 2-Player display: </h3>
-    <div style="border: 2px solid white; margin: 20px 0px;"> </div>
-    <img src="./assets/2Pdisplay.png" style="width: 200px; max-width: 100%;"/>
-  </div>
-  <div style ="flex: 1;">
-    <h3 style="text-align: center;"> 4-Player display: </h3>
-      <div style="border: 2px solid white;margin: 20px 0px;"> </div>
-    <img src="./assets/4Pdisplay.png" style="width: 200px; max-width: 100%;"/>
-  </div>
-</div>
+<table style="width: 100%; border-collapse: collapse; border: 5px solid white; padding: 10px 20px;">
+  <tr>
+    <td style="text-align: center; width: 50%; padding: 10px; vertical-align: top;">
+      <h3>2-Player display:</h3>
+      <div style="border: 2px solid white; margin: 20px 0;"></div>
+      <img src="./assets/2Pdisplay.png" style="width: 100%; max-width: 100%;" />
+    </td>
+    <td style="text-align: center; width: 50%; padding: 10px; vertical-align: top;">
+      <h3>4-Player display:</h3>
+      <div style="border: 2px solid white; margin: 20px 0;"></div>
+      <img src="./assets/4Pdisplay.png" style="width: 100%; max-width: 100%;" />
+    </td>
+  </tr>
+</table>
